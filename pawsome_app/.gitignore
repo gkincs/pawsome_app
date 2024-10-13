@@ -41,3 +41,51 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Firebase specific
+**/google-services.json        # Contains sensitive data for Android
+**/GoogleService-Info.plist    # Contains sensitive data for iOS/macOS
+
+# Windows specific (if building for Windows)
+windows/runner/Debug/
+windows/runner/Release/
+windows/.vs/                  # Visual Studio generated files
+windows/.dart_tool/
+windows/build/
+
+# Gradle specific
+.gradle/
+android/.gradle/
+android/local.properties       # Contains local SDK paths and sensitive info
+
+# iOS specific
+ios/Pods/
+ios/Podfile.lock
+DerivedData/
+ios/.generated/
+*.xcworkspace/
+*.xcuserstate
+ios/Flutter/Flutter.framework/
+ios/Flutter/Flutter.podspec
+ios/ServiceDefinitions.json
+*.hmap
+*.ipa
+
+# Android specific
+android/app/src/debug/
+android/app/src/profile/
+android/app/src/release/
+android/app/src/main/assets/
+android/app/src/main/res/raw/google-services.json
+android/.gradle/
+android/local.properties
+
+# Miscellaneous
+*.log
+*.lock
+*.swp
+
+# IDE specific
+.idea/
+.vscode/
+
