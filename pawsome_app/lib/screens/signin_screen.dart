@@ -39,7 +39,6 @@ class SigninWidget extends StatelessWidget {
               SizedBox(height: 16),
               TextButton(
                 onPressed: () {
-                  // Create account gomb esemény
                 },
                 child: Text('Create an account'),
               ),
