@@ -1,49 +1,7 @@
 import 'package:flutter/material.dart';
-//import 'screens/signin_screen.dart';
-//import 'screens/new_account_screen.dart'; 
-
-// void main() {
-//   runApp(MyApp());
-// }
-
-// class MyApp extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       debugShowCheckedModeBanner: false, // Elrejti a debug bannert
-//       home: Scaffold(
-//         body: SigninWidget(),
-//       ),
-//     );
-//   }
-// }
-
-// void main() {
-//   runApp(MyApp());
-// }
-
-// class MyApp extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       title: 'Flutter Demo',
-//       theme: ThemeData(
-//         primarySwatch: Colors.blue,
-//       ),
-//       home: Scaffold(
-//         appBar: AppBar(
-//           title: Text(''),
-//         ),
-//         body: Center(
-//           child: NewAccountWidget(), // Use the NewAccountWidget here
-//         ),
-//       ),
-//     );
-//   }
-// }
+import 'package:pawsome_app/screens/health_info_screen.dart';
 
 
-import 'screens/first_step_screen.dart';
 void main() {
   runApp(MyApp());
 }
@@ -56,7 +14,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home:FirststepWidget(), 
+      home:HealthInfoWidget(), 
     );
   }
 }
