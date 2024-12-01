@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 
-class SigninWidget extends StatelessWidget {
+class SigninWidget extends StatefulWidget {
+  @override
+  _SigninWidgetState createState() => _SigninWidgetState();
+}
+
+class _SigninWidgetState extends State<SigninWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 16.0),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Column(
-            mainAxisSize: MainAxisSize.max, // A maximális hely kitöltése
-            mainAxisAlignment: MainAxisAlignment.center, // Középre igazítás
-            crossAxisAlignment: CrossAxisAlignment.stretch, // Teljes szélesség kitöltése
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               Align(
                 alignment: Alignment.topCenter,
@@ -26,21 +30,22 @@ class SigninWidget extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(height: 100), // Hely a PawSome és a Sign in között
+              const SizedBox(height: 100),
               ElevatedButton(
                 onPressed: () {
-                  // Sign in gomb esemény
+                  // Handle sign-in action
                 },
-                child: Text('Sign in'),
                 style: ElevatedButton.styleFrom(
-                  minimumSize: Size(double.infinity, 48), // Gomb szélessége
+                  minimumSize: Size(double.infinity, 48),
                 ),
+                child: const Text('Sign in'),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               TextButton(
                 onPressed: () {
+                  // Handle create account action
                 },
-                child: Text('Create an account'),
+                child: const Text('Create an account'),
               ),
             ],
           ),

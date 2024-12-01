@@ -1,27 +1,55 @@
 import 'package:flutter/material.dart';
 
-class NewAccountWidget extends StatelessWidget {
+class NewAccountWidget extends StatefulWidget {
+  @override
+  _NewAccountWidgetState createState() => _NewAccountWidgetState();
+}
+
+class _NewAccountWidgetState extends State<NewAccountWidget> {
+  final TextEditingController _fullNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _fullNameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView( // Allow scrolling if content overflows
-      child: Container(
-        width: 360,
-        padding: EdgeInsets.all(16), // Add padding for better layout
-        decoration: BoxDecoration(color: Colors.white),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            _buildHeader(),
-            SizedBox(height: 40), // Space between header and input fields
-            _buildInputField('Full name'),
-            _buildInputField('Email'),
-            _buildInputField('Password'),
-            SizedBox(height: 30), // Space before button
-            _buildCreateAccountButton(),
-            SizedBox(height: 20), // Space before sign-in text
-            _buildSignInText(),
-          ],
+    return Scaffold(
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: IntrinsicHeight(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        _buildHeader(),
+                        SizedBox(height: 40),
+                        _buildInputField(_fullNameController, 'Full name'),
+                        _buildInputField(_emailController, 'Email'),
+                        _buildInputField(_passwordController, 'Password', isPassword: true),
+                        SizedBox(height: 30),
+                        _buildCreateAccountButton(),
+                        SizedBox(height: 20),
+                        _buildSignInText(),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
@@ -35,13 +63,13 @@ class NewAccountWidget extends StatelessWidget {
         fontWeight: FontWeight.bold,
         color: Colors.black,
       ),
+      textAlign: TextAlign.center,
     );
   }
 
-  Widget _buildInputField(String label) {
+  Widget _buildInputField(TextEditingController controller, String label, {bool isPassword = false}) {
     return Container(
-      width: 294, // Set a specific width for the input fields
-      margin: EdgeInsets.symmetric(vertical: 10), // Vertical margin for spacing
+      margin: EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(4),
         boxShadow: [
@@ -51,39 +79,33 @@ class NewAccountWidget extends StatelessWidget {
             blurRadius: 4,
           ),
         ],
-        color: Color.fromRGBO(255, 255, 255, 1), // Use solid white
+        color: Colors.white,
         border: Border.all(color: Colors.black, width: 1),
       ),
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: TextField(
+        controller: controller,
+        obscureText: isPassword,
         decoration: InputDecoration(
           labelText: label,
           border: InputBorder.none,
+          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         ),
       ),
     );
   }
 
   Widget _buildCreateAccountButton() {
-    return Container(
-      width: double.infinity, // Make button full width
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(100),
-        color: Color.fromRGBO(78, 130, 255, 1),
-      ),
-      padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-      child: TextButton(
-        onPressed: () {}, // Add your onPressed logic here
-        child: Text(
-          'Create Account',
-          style: TextStyle(
-            color: Colors.white,
-            fontFamily: 'Roboto',
-            fontSize: 14,
-            letterSpacing: 0.1,
-            fontWeight: FontWeight.normal,
-          ),
+    return ElevatedButton(
+      onPressed: () {
+        // Add your account creation logic here
+      },
+      child: Text('Create Account'),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Color.fromRGBO(78, 130, 255, 1),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(100),
         ),
+        padding: EdgeInsets.symmetric(vertical: 16),
       ),
     );
   }
@@ -95,24 +117,21 @@ class NewAccountWidget extends StatelessWidget {
           'Already have an account?',
           style: TextStyle(
             color: Colors.black,
-            fontFamily: 'Roboto',
             fontSize: 12,
             letterSpacing: 0.4,
-            fontWeight: FontWeight.normal,
           ),
         ),
         TextButton(
           onPressed: () {
-            // Add your sign-in logic here
+            // Add your sign-in navigation logic here
           },
           child: Text(
             'Sign in',
             style: TextStyle(
-              color: Color.fromRGBO(0, 0, 0, 1),
-              fontFamily: 'Roboto',
+              color: Colors.black,
               fontSize: 12,
               letterSpacing: 0.4,
-              fontWeight: FontWeight.normal,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ),
@@ -120,4 +139,3 @@ class NewAccountWidget extends StatelessWidget {
     );
   }
 }
-
