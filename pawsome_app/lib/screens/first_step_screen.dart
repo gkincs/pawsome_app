@@ -45,7 +45,7 @@ class _FirststepWidgetState extends State<FirststepWidget> {
       'PawSome',
       style: TextStyle(
         fontSize: 26,
-        fontWeight: FontWeight.normal,
+        fontWeight: FontWeight.bold,
         color: Colors.black,
       ),
       textAlign: TextAlign.center,
@@ -72,8 +72,8 @@ class _FirststepWidgetState extends State<FirststepWidget> {
       child: Text('Add'),
       style: ElevatedButton.styleFrom(
         minimumSize: Size(double.infinity, 48),
-        backgroundColor: Color.fromRGBO(78, 130, 255, 0.9),
-        foregroundColor: Colors.white,
+        //backgroundColor: Color.fromRGBO(78, 130, 255, 0.9),
+        //foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(100),
         ),
