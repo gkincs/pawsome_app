@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class NewAccountWidget extends StatefulWidget {
   @override
@@ -37,8 +39,16 @@ class _NewAccountWidgetState extends State<NewAccountWidget> {
                         _buildHeader(),
                         SizedBox(height: 40),
                         _buildInputField(_fullNameController, 'Full name'),
-                        _buildInputField(_emailController, 'Email'),
-                        _buildInputField(_passwordController, 'Password', isPassword: true),
+                        _buildInputField(
+                          _emailController,
+                          'Email',
+                          keyboardType: TextInputType.emailAddress,
+                        ),
+                        _buildInputField(
+                          _passwordController,
+                          'Password',
+                          isPassword: true,
+                        ),
                         SizedBox(height: 30),
                         _buildCreateAccountButton(),
                         SizedBox(height: 20),
@@ -67,7 +77,12 @@ class _NewAccountWidgetState extends State<NewAccountWidget> {
     );
   }
 
-  Widget _buildInputField(TextEditingController controller, String label, {bool isPassword = false}) {
+  Widget _buildInputField(
+    TextEditingController controller,
+    String label, {
+    bool isPassword = false,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
@@ -85,6 +100,8 @@ class _NewAccountWidgetState extends State<NewAccountWidget> {
       child: TextField(
         controller: controller,
         obscureText: isPassword,
+        keyboardType: keyboardType,
+        textInputAction: TextInputAction.next,
         decoration: InputDecoration(
           labelText: label,
           border: InputBorder.none,
@@ -96,8 +113,49 @@ class _NewAccountWidgetState extends State<NewAccountWidget> {
 
   Widget _buildCreateAccountButton() {
     return ElevatedButton(
-      onPressed: () {
-        // Add your account creation logic here
+      onPressed: () async {
+        String fullName = _fullNameController.text.trim();
+        String email = _emailController.text.trim();
+        String password = _passwordController.text.trim();
+
+        if (fullName.isNotEmpty && email.isNotEmpty && password.isNotEmpty) {
+          try {
+            // Firebase Authentication - Felhasználó létrehozása
+            UserCredential userCredential = await FirebaseAuth.instance
+                .createUserWithEmailAndPassword(
+              email: email,
+              password: password,
+            );
+
+            String uid = userCredential.user!.uid;
+
+            // Felhasználói adatok mentése a Firestore-be
+            await FirebaseFirestore.instance.collection('users').doc(uid).set({
+              'uid': uid,
+              'fullName': fullName,
+              'email': email,
+              'registrationDate': Timestamp.now(),
+            });
+
+            // Sikeres mentés üzenet
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Account created successfully!')),
+            );
+
+            // Navigáció vissza a bejelentkezési oldalra
+            Navigator.pushNamed(context, '/signin');
+          } catch (e) {
+            // Hibaüzenet
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Error: $e')),
+            );
+          }
+        } else {
+          // Figyelmeztetés, ha valami hiányzik
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Please fill out all fields!')),
+          );
+        }
       },
       child: Text('Create Account'),
       style: ElevatedButton.styleFrom(
@@ -123,7 +181,7 @@ class _NewAccountWidgetState extends State<NewAccountWidget> {
         ),
         TextButton(
           onPressed: () {
-            // Add your sign-in navigation logic here
+            Navigator.pushNamed(context, '/signin'); // Navigate to sign-in page
           },
           child: Text(
             'Sign in',

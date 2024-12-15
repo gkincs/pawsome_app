@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:pawsome_app/screens/first_step_screen.dart';
+// import 'package:pawsome_app/screens/appointment_screen.dart';
+// import 'package:pawsome_app/screens/expenses_screen.dart';
+// import 'package:pawsome_app/screens/first_step_screen.dart';
 import 'package:pawsome_app/screens/login_screen.dart';
+import 'package:pawsome_app/screens/new_account_screen.dart';
+//mport 'package:pawsome_app/screens/nutrition_diary.dart';
+//import 'activity_screen.dart';
 import 'signin_screen.dart';
+// import 'expenses_screen.dart';
+// import 'appointment_screen.dart';
+//import 'activity_history_screen.dart';
 
 class ScreenManager extends StatefulWidget {
   @override
@@ -13,7 +21,13 @@ class _ScreenManagerState extends State<ScreenManager> {
   final List<Widget> _screens = [
     LoginWidget(),
     SigninWidget(),
-    FirststepWidget(),
+    NewAccountWidget()
+
+    //FirststepWidget(),
+    //NutritionDiaryWidget(),
+    //ActivityScreenWidget(),
+    //ExpensesWidget(),
+    //AppointmentWidget()
     // Add other screens here
   ];
 

@@ -6,15 +6,47 @@ class LoginWidget extends StatefulWidget {
 }
 
 class _LoginWidgetState extends State<LoginWidget> {
-  final TextEditingController _fullNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _rememberMe = false;
 
   @override
   void dispose() {
-    _fullNameController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  void _performLogin() {
+    final email = _emailController.text;
+    final password = _passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
+      _showMessage('Please fill in both fields.');
+      return;
+    }
+
+    // if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+\$').hasMatch(email)) {
+    //   _showMessage('Please enter a valid email address.');
+    //   return;
+    // }
+
+    // Simulated login logic
+    if (email == 'user@example.com' && password == 'password123') {
+      _showMessage('Login successful!', success: true);
+    } else {
+      _showMessage('Invalid email or password.');
+    }
+  }
+
+  void _showMessage(String message, {bool success = false}) {
+    final color = success ? Colors.green : Colors.red;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: color,
+      ),
+    );
   }
 
   @override
@@ -44,9 +76,19 @@ class _LoginWidgetState extends State<LoginWidget> {
                           textAlign: TextAlign.center,
                         ),
                         SizedBox(height: 20),
-                        _buildTextField(_fullNameController, 'Full Name', false),
+                        _buildTextField(
+                          _emailController,
+                          'Email',
+                          false,
+                          TextInputType.emailAddress,
+                        ),
                         SizedBox(height: 20),
-                        _buildTextField(_passwordController, 'Password', true),
+                        _buildTextField(
+                          _passwordController,
+                          'Password',
+                          true,
+                          TextInputType.text,
+                        ),
                         SizedBox(height: 10),
                         _buildRememberMeAndForgotPassword(),
                         SizedBox(height: 20),
@@ -65,10 +107,17 @@ class _LoginWidgetState extends State<LoginWidget> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String label, bool isPassword) {
+  Widget _buildTextField(
+    TextEditingController controller,
+    String label,
+    bool isPassword,
+    TextInputType inputType,
+  ) {
     return TextField(
       controller: controller,
       obscureText: isPassword,
+      keyboardType: inputType,
+      textInputAction: isPassword ? TextInputAction.done : TextInputAction.next,
       decoration: InputDecoration(
         labelText: label,
         border: OutlineInputBorder(),
@@ -105,9 +154,7 @@ class _LoginWidgetState extends State<LoginWidget> {
 
   Widget _buildLoginButton() {
     return ElevatedButton(
-      onPressed: () {
-        // Login logic
-      },
+      onPressed: _performLogin,
       child: Text('Login'),
       style: ElevatedButton.styleFrom(
         padding: EdgeInsets.symmetric(vertical: 15),
