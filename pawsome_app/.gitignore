@@ -89,3 +89,7 @@ android/local.properties
 .idea/
 .vscode/
 
+# Flutter generated files
+.flutter-plugins
+.flutter-plugins-dependencies
+.generated_plugins.dart
