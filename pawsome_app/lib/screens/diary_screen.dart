@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class DiaryWidget extends StatefulWidget {
-  const DiaryWidget({Key? key}) : super(key: key);
+  const DiaryWidget({super.key});
 
   @override
   _DiaryWidgetState createState() => _DiaryWidgetState();

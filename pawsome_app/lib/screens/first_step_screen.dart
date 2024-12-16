@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class FirststepWidget extends StatefulWidget {
+  const FirststepWidget({super.key});
+
   @override
   _FirststepWidgetState createState() => _FirststepWidgetState();
 }
@@ -69,7 +71,6 @@ class _FirststepWidgetState extends State<FirststepWidget> {
       onPressed: () {
         // Add button action
       },
-      child: Text('Add'),
       style: ElevatedButton.styleFrom(
         minimumSize: Size(double.infinity, 48),
         //backgroundColor: Color.fromRGBO(78, 130, 255, 0.9),
@@ -78,6 +79,7 @@ class _FirststepWidgetState extends State<FirststepWidget> {
           borderRadius: BorderRadius.circular(100),
         ),
       ),
+      child: Text('Add'),
     );
   }
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class ExpensesWidget extends StatefulWidget {
-  const ExpensesWidget({Key? key}) : super(key: key);
+  const ExpensesWidget({super.key});
 
   @override
   _ExpensesWidgetState createState() => _ExpensesWidgetState();

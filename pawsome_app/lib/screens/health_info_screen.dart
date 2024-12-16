@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 
 class HealthInfoWidget extends StatefulWidget {
+  const HealthInfoWidget({super.key});
+
   @override
   _HealthInfoWidgetState createState() => _HealthInfoWidgetState();
 }
 
 class _HealthInfoWidgetState extends State<HealthInfoWidget> {
-  TextEditingController _medicineNameController = TextEditingController();
-  TextEditingController _dosageController = TextEditingController();
-  TextEditingController _frequencyController = TextEditingController();
+  final TextEditingController _medicineNameController = TextEditingController();
+  final TextEditingController _dosageController = TextEditingController();
+  final TextEditingController _frequencyController = TextEditingController();
   DateTime? _startDate;
   DateTime? _endDate;
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class NutritionDiaryWidget extends StatefulWidget {
-  const NutritionDiaryWidget({Key? key}) : super(key: key);
+  const NutritionDiaryWidget({super.key});
 
   @override
   _NutritionDiaryWidgetState createState() => _NutritionDiaryWidgetState();

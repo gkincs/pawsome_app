@@ -10,6 +10,8 @@ void main() async{
 
 
 class Pawsome extends StatelessWidget {
+  const Pawsome({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

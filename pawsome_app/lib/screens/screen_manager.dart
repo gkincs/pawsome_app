@@ -12,6 +12,8 @@ import 'signin_screen.dart';
 //import 'activity_history_screen.dart';
 
 class ScreenManager extends StatefulWidget {
+  const ScreenManager({super.key});
+
   @override
   _ScreenManagerState createState() => _ScreenManagerState();
 }
@@ -19,8 +21,9 @@ class ScreenManager extends StatefulWidget {
 class _ScreenManagerState extends State<ScreenManager> {
   int _currentIndex = 0;
   final List<Widget> _screens = [
-    LoginWidget(),
+    
     SigninWidget(),
+    LoginWidget(),
     NewAccountWidget()
 
     //FirststepWidget(),
@@ -43,9 +46,9 @@ class _ScreenManagerState extends State<ScreenManager> {
           });
         },
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.login), label: 'Login'),
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Sign In'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Start'),
+          BottomNavigationBarItem(icon: Icon(Icons.login), label: 'Sign in'),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Login'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'New Account'),
           // Add other navigation items here
         ],
       ),

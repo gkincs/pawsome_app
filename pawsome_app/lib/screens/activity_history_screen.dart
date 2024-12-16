@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ActivityHistoryWidget extends StatefulWidget {
-  const ActivityHistoryWidget({Key? key}) : super(key: key);
+  const ActivityHistoryWidget({super.key});
 
   @override
   _ActivityHistoryWidgetState createState() => _ActivityHistoryWidgetState();

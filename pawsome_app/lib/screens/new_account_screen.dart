@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class NewAccountWidget extends StatefulWidget {
+  const NewAccountWidget({super.key});
+
   @override
   _NewAccountWidgetState createState() => _NewAccountWidgetState();
 }
@@ -157,7 +159,6 @@ class _NewAccountWidgetState extends State<NewAccountWidget> {
           );
         }
       },
-      child: Text('Create Account'),
       style: ElevatedButton.styleFrom(
         backgroundColor: Color.fromRGBO(78, 130, 255, 1),
         shape: RoundedRectangleBorder(
@@ -165,6 +166,7 @@ class _NewAccountWidgetState extends State<NewAccountWidget> {
         ),
         padding: EdgeInsets.symmetric(vertical: 16),
       ),
+      child: Text('Create Account'),
     );
   }
 

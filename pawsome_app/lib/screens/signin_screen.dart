@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:pawsome_app/screens/login_screen.dart';
+import 'package:pawsome_app/screens/new_account_screen.dart';
 
 class SigninWidget extends StatefulWidget {
+  const SigninWidget({super.key});
+
   @override
   _SigninWidgetState createState() => _SigninWidgetState();
 }
@@ -33,7 +37,11 @@ class _SigninWidgetState extends State<SigninWidget> {
               const SizedBox(height: 100),
               ElevatedButton(
                 onPressed: () {
-                  // Handle sign-in action
+              // Navigáció a LoginWidget-re
+              Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => LoginWidget()),
+            );
                 },
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(double.infinity, 48),
@@ -43,9 +51,17 @@ class _SigninWidgetState extends State<SigninWidget> {
               const SizedBox(height: 16),
               TextButton(
                 onPressed: () {
-                  // Handle create account action
-                },
+
+          },
+                  child: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => NewAccountWidget()),
+            );
+          },
                 child: const Text('Create an account'),
+                ),
               ),
             ],
           ),

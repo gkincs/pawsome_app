@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class LoginWidget extends StatefulWidget {
+  const LoginWidget({super.key});
+
   @override
   _LoginWidgetState createState() => _LoginWidgetState();
 }
@@ -155,13 +157,13 @@ class _LoginWidgetState extends State<LoginWidget> {
   Widget _buildLoginButton() {
     return ElevatedButton(
       onPressed: _performLogin,
-      child: Text('Login'),
       style: ElevatedButton.styleFrom(
         padding: EdgeInsets.symmetric(vertical: 15),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30),
         ),
       ),
+      child: Text('Login'),
     );
   }
 
