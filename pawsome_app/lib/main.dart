@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pawsome_app/bloc/bottom_navigation_bloc.dart';
-import 'package:pawsome_app/screens/pet_screen.dart';
 import 'screens/screen_manager.dart';
 
 void main() async {
