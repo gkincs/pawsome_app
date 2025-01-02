@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
 
-class ActivityItem {
+class ExpenseItem {
   final String type;
-  final String duration;
+  final String amount;
 
-  ActivityItem({required this.type, required this.duration});
+  ExpenseItem({required this.type, required this.amount});
 }
 
-class ActivityHistoryWidget extends StatefulWidget {
-  const ActivityHistoryWidget({Key? key}) : super(key: key);
+class ExpensesHistoryWidget extends StatefulWidget {
+  const ExpensesHistoryWidget({Key? key}) : super(key: key);
 
   @override
-  _ActivityHistoryWidgetState createState() => _ActivityHistoryWidgetState();
+  _ExpensesHistoryWidgetState createState() => _ExpensesHistoryWidgetState();
 }
 
-class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
-  final List<ActivityItem> activities = [
-    ActivityItem(type: 'Walk', duration: '1 hour'),
-    ActivityItem(type: 'Play', duration: '< 30 min'),
-    ActivityItem(type: 'Walk', duration: '1+ hour'),
+class _ExpensesHistoryWidgetState extends State<ExpensesHistoryWidget> {
+  final List<ExpenseItem> expenses = [
+    ExpenseItem(type: 'Food - Nutrition', amount: '£15'),
+    ExpenseItem(type: 'Healthcare', amount: '20'),
+    ExpenseItem(type: 'Food - Nutrition', amount: '£5'),
   ];
 
   @override
@@ -35,7 +35,8 @@ class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    _buildActivitySection(),
+                    _buildHistorySection(),
+                    //_buildTotalAmount(),
                     _buildAddButton(),
                     const SizedBox(height: 16),
                   ],
@@ -60,7 +61,7 @@ class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
           ),
           const Expanded(
             child: Text(
-              'Activity Informations',
+              'Expenses',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 22,
@@ -75,13 +76,13 @@ class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
     );
   }
 
-  Widget _buildActivitySection() {
+  Widget _buildHistorySection() {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
           const Text(
-            'Activity Type',
+            'History',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 20,
@@ -92,9 +93,9 @@ class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
           ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: activities.length,
+            itemCount: expenses.length,
             itemBuilder: (context, index) {
-              return _buildActivityCard(activities[index]);
+              return _buildExpenseCard(expenses[index]);
             },
           ),
         ],
@@ -102,7 +103,7 @@ class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
     );
   }
 
-  Widget _buildActivityCard(ActivityItem activity) {
+  Widget _buildExpenseCard(ExpenseItem expense) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       elevation: 0,
@@ -115,22 +116,21 @@ class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              activity.type,
+              expense.type,
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
                 color: Color(0xFF65558F),
               ),
             ),
-            const SizedBox(height: 4),
             Text(
-              'Duration: ${activity.duration}',
+              expense.amount,
               style: const TextStyle(
-                fontSize: 14,
+                fontSize: 16,
                 color: Colors.grey,
               ),
             ),
@@ -140,23 +140,39 @@ class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
     );
   }
 
+  // Widget _buildTotalAmount() {
+  //   return Padding(
+  //     padding: const EdgeInsets.symmetric(horizontal: 16),
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.end,
+  //       children: const [
+  //         Text(
+  //           'This month: 40',
+  //           style: TextStyle(
+  //             fontSize: 14,
+  //             color: Colors.grey,
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
   Widget _buildAddButton() {
     return Padding(
       padding: const EdgeInsets.all(16),
-      child: Center(
-        child: SizedBox(
-          width: 120,
-          child: ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFEADDFF),
-              foregroundColor: Color(0xFF65558F),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(100),
-              ),
+      child: SizedBox(
+        width: 120, 
+        child: ElevatedButton(
+          onPressed: () {},
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFFEADDFF),
+            foregroundColor: Color(0xFF65558F),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(100),
             ),
-            child: const Text('Add'),
           ),
+          child: const Text('Add'),
         ),
       ),
     );

@@ -132,23 +132,28 @@ class _NutritionHistoryWidgetState extends State<NutritionHistoryWidget> {
     );
   }
 
-  Widget _buildAddButton() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: ElevatedButton(
-        onPressed: () {},
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFEADDFF),
-          foregroundColor: const Color(0xFF65558F),
-          minimumSize: const Size(double.infinity, 50),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(100),
+Widget _buildAddButton() {
+  return Padding(
+    padding: const EdgeInsets.all(16),
+    child: Center(  // Wrap with Center widget
+      child: SizedBox(
+        width: 120,
+        child: ElevatedButton(
+          onPressed: () {},
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFFEADDFF),
+            foregroundColor: Color(0xFF65558F),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(100),
+            ),
           ),
+          child: const Text('Add'),
         ),
-        child: const Text('Add'),
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   Widget _buildNavItem(String label, bool isSelected) {
     return Column(
