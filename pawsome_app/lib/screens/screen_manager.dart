@@ -11,6 +11,7 @@ import 'package:pawsome_app/screens/health_info_screen.dart';
 import 'package:pawsome_app/screens/login_screen.dart';
 import 'package:pawsome_app/screens/new_account_screen.dart';
 import 'package:pawsome_app/screens/nutrition_diary.dart';
+import 'package:pawsome_app/screens/nutrition_history_screen.dart';
 import 'package:pawsome_app/screens/pet_prof_screen.dart';
 import 'package:pawsome_app/screens/pet_screen.dart';
 import 'package:pawsome_app/screens/signin_screen.dart';
@@ -37,7 +38,7 @@ class ScreenManager extends StatelessWidget {
       PetScreenWidget(), 
       DiaryWidget(),
       NutritionDiaryWidget(),
-      //NutritionHistoryWidget(), - HIÁNYZÓ WIDGET !!!
+      NutritionHistoryWidget(),
       ActivityScreenWidget(),
       ActivityHistoryWidget(),
       ExpensesWidget(),
