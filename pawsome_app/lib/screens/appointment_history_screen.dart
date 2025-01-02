@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
 
-class ActivityItem {
+class AppointmentItem {
   final String type;
-  final String duration;
+  final String date;
 
-  ActivityItem({required this.type, required this.duration});
+  AppointmentItem({required this.type, required this.date});
 }
 
-class ActivityHistoryWidget extends StatefulWidget {
-  const ActivityHistoryWidget({super.key});
+class AppointmentHistoryWidget extends StatefulWidget {
+  const AppointmentHistoryWidget({super.key});
 
   @override
-  _ActivityHistoryWidgetState createState() => _ActivityHistoryWidgetState();
+  _AppointmentHistoryWidgetState createState() => _AppointmentHistoryWidgetState();
 }
 
-class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
-  final List<ActivityItem> activities = [
-    ActivityItem(type: 'Walk', duration: '1 hour'),
-    ActivityItem(type: 'Play', duration: '< 30 min'),
-    ActivityItem(type: 'Walk', duration: '1+ hour'),
+class _AppointmentHistoryWidgetState extends State<AppointmentHistoryWidget> {
+  final List<AppointmentItem> appointments = [
+    AppointmentItem(type: 'Vet appointment', date: '2024.10.05 - 14:30'),
+    AppointmentItem(type: 'Grooming appointment', date: '2024.10.15 - 16:00'),
   ];
 
   @override
@@ -35,7 +34,7 @@ class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    _buildActivitySection(),
+                    _buildAppointmentSection(),
                     _buildAddButton(),
                     const SizedBox(height: 16),
                   ],
@@ -60,7 +59,7 @@ class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
           ),
           const Expanded(
             child: Text(
-              'Activity Informations',
+              'Appointments',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 22,
@@ -75,13 +74,13 @@ class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
     );
   }
 
-  Widget _buildActivitySection() {
+  Widget _buildAppointmentSection() {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
           const Text(
-            'Activity Type',
+            'Upcoming',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 20,
@@ -92,9 +91,9 @@ class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
           ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: activities.length,
+            itemCount: appointments.length,
             itemBuilder: (context, index) {
-              return _buildActivityCard(activities[index]);
+              return _buildAppointmentCard(appointments[index]);
             },
           ),
         ],
@@ -102,7 +101,7 @@ class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
     );
   }
 
-  Widget _buildActivityCard(ActivityItem activity) {
+  Widget _buildAppointmentCard(AppointmentItem appointment) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       elevation: 0,
@@ -115,31 +114,54 @@ class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              activity.type,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: Color(0xFF65558F),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    appointment.type,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF65558F),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    appointment.date,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 4),
-            Text(
-              'Duration: ${activity.duration}',
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-              ),
+            Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.notifications_outlined),
+                  onPressed: () {},
+                  color: const Color(0xFF65558F),
+                  iconSize: 20,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.edit_outlined),
+                  onPressed: () {},
+                  color: const Color(0xFF65558F),
+                  iconSize: 20,
+                ),
+              ],
             ),
           ],
         ),
       ),
     );
   }
-
+  
   Widget _buildAddButton() {
     return Padding(
       padding: const EdgeInsets.all(16),

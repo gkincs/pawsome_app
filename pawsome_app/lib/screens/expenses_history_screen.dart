@@ -8,7 +8,7 @@ class ExpenseItem {
 }
 
 class ExpensesHistoryWidget extends StatefulWidget {
-  const ExpensesHistoryWidget({Key? key}) : super(key: key);
+  const ExpensesHistoryWidget({super.key});
 
   @override
   _ExpensesHistoryWidgetState createState() => _ExpensesHistoryWidgetState();

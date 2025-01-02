@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
 
-class ActivityItem {
-  final String type;
-  final String duration;
+class MedicationItem {
+  final String name;
+  final String dosage;
 
-  ActivityItem({required this.type, required this.duration});
+  MedicationItem({required this.name, required this.dosage});
 }
 
-class ActivityHistoryWidget extends StatefulWidget {
-  const ActivityHistoryWidget({super.key});
+class MedicationHistoryWidget extends StatefulWidget {
+  const MedicationHistoryWidget({super.key});
 
   @override
-  _ActivityHistoryWidgetState createState() => _ActivityHistoryWidgetState();
+  _MedicationHistoryWidgetState createState() => _MedicationHistoryWidgetState();
 }
 
-class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
-  final List<ActivityItem> activities = [
-    ActivityItem(type: 'Walk', duration: '1 hour'),
-    ActivityItem(type: 'Play', duration: '< 30 min'),
-    ActivityItem(type: 'Walk', duration: '1+ hour'),
+class _MedicationHistoryWidgetState extends State<MedicationHistoryWidget> {
+  final List<MedicationItem> medications = [
+    MedicationItem(name: 'Antibiotic', dosage: '1 pill'),
+    MedicationItem(name: 'Vitamin', dosage: '2 pills'),
+    MedicationItem(name: 'Pain killer', dosage: '1/2 pill'),
   ];
 
   @override
@@ -35,7 +35,7 @@ class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    _buildActivitySection(),
+                    _buildMedicationSection(),
                     _buildAddButton(),
                     const SizedBox(height: 16),
                   ],
@@ -60,7 +60,7 @@ class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
           ),
           const Expanded(
             child: Text(
-              'Activity Informations',
+              'Medications',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 22,
@@ -75,13 +75,13 @@ class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
     );
   }
 
-  Widget _buildActivitySection() {
+  Widget _buildMedicationSection() {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
           const Text(
-            'Activity Type',
+            'History',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 20,
@@ -92,9 +92,9 @@ class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
           ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: activities.length,
+            itemCount: medications.length,
             itemBuilder: (context, index) {
-              return _buildActivityCard(activities[index]);
+              return _buildMedicationCard(medications[index]);
             },
           ),
         ],
@@ -102,43 +102,66 @@ class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
     );
   }
 
-  Widget _buildActivityCard(ActivityItem activity) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-        side: const BorderSide(
-          color: Color(0xFFEADDFF),
-          width: 1,
-        ),
+ Widget _buildMedicationCard(MedicationItem medication) {
+  return Card(
+    margin: const EdgeInsets.only(bottom: 8),
+    elevation: 0,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(8),
+      side: const BorderSide(
+        color: Color(0xFFEADDFF),
+        width: 1,
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              activity.type,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: Color(0xFF65558F),
-              ),
+    ),
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  medication.name,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF65558F),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Dosage: ${medication.dosage}',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 4),
-            Text(
-              'Duration: ${activity.duration}',
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
+          ),
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.notifications_outlined),
+                onPressed: () {},
+                color: const Color(0xFF65558F),
+                iconSize: 20,
               ),
-            ),
-          ],
-        ),
+              IconButton(
+                icon: const Icon(Icons.edit_outlined),
+                onPressed: () {},
+                color: const Color(0xFF65558F),
+                iconSize: 20,
+              ),
+            ],
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildAddButton() {
     return Padding(

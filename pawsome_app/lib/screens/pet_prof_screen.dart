@@ -3,7 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 class PetProfileWidget extends StatefulWidget {
-  const PetProfileWidget({Key? key}) : super(key: key);
+  const PetProfileWidget({super.key});
 
   @override
   _PetProfileWidgetState createState() => _PetProfileWidgetState();
