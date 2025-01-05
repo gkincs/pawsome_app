@@ -31,9 +31,8 @@ class _SigninWidgetState extends State<SigninWidget> {
                       children: [
                         _buildLogo(),
                         const SizedBox(height: 100),
-                        _buildSignInButton(),
+                        _buildSignInButton(context),
                         const SizedBox(height: 16),
-                        //_buildCreateAccountButton(),
                       ],
                     ),
                   ),
@@ -58,14 +57,15 @@ class _SigninWidgetState extends State<SigninWidget> {
     );
   }
 
-  Widget _buildSignInButton() {
+  Widget _buildSignInButton(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        context.read<BottomNavigationBloc>().add(UpdateIndex(1));
+        // Tartalom frissítése (LoginWidget megjelenítése)
+        context.read<BottomNavigationBloc>().add(UpdateContent(1)); // Frissítjük a tartalom indexét (LoginWidget)
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFFEADDFF), 
-        foregroundColor: Color(0xFF65558F),
+        backgroundColor: const Color(0xFFEADDFF),
+        foregroundColor: const Color(0xFF65558F),
         minimumSize: const Size(double.infinity, 48),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
@@ -74,21 +74,4 @@ class _SigninWidgetState extends State<SigninWidget> {
       child: const Text('Sign in'),
     );
   }
-
-  // Widget _buildCreateAccountButton() {
-  //   return ElevatedButton(
-  //     onPressed: () {
-  //       context.read<BottomNavigationBloc>().add(UpdateIndex(2));
-  //     },
-  //     style: ElevatedButton.styleFrom(
-  //       backgroundColor: const Color(0xFF65558F),
-  //       foregroundColor: Colors.white,
-  //       minimumSize: const Size(double.infinity, 48),
-  //       shape: RoundedRectangleBorder(
-  //         borderRadius: BorderRadius.circular(8),
-  //       ),
-  //     ),
-  //     child: const Text('Create an account'),
-  //   );
-  // }
 }

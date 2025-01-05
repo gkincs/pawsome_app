@@ -31,6 +31,11 @@ class ScreenManager extends StatelessWidget {
       (BottomNavigationBloc bloc) => bloc.state.currentIndex,
     );
 
+    // Az aktuális tartalom indexének lekérése a Bloc állapotából
+    final contentIndex = context.select(
+      (BottomNavigationBloc bloc) => bloc.state.contentIndex,
+    );
+
     // A képernyők listája
     final List<Widget> screens = [
       SigninWidget(),
@@ -56,16 +61,15 @@ class ScreenManager extends StatelessWidget {
 
     return Scaffold(
       body: IndexedStack(
-        index: currentIndex,
-        children: screens, // A képernyők listája
+        index: contentIndex, // Csak a tartalom frissül
+        children: screens,
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: currentIndex,
+        currentIndex: currentIndex, // A navbar indexe nem változik
         onTap: (index) {
-          // Esemény küldése a Bloc-nak az index frissítéséhez
-          context.read<BottomNavigationBloc>().add(UpdateIndex(index));
+          context.read<BottomNavigationBloc>().add(UpdateIndex(index)); // Frissítjük a navbar indexét
         },
-        items: [
+        items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.login), label: 'Pets'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Diary'),

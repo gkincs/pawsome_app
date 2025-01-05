@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pawsome_app/bloc/bottom_navigation_bloc.dart';
 
 class LoginWidget extends StatefulWidget {
   const LoginWidget({super.key});
@@ -171,12 +173,20 @@ class _LoginWidgetState extends State<LoginWidget> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text("Don't have an account?"),
+        const Text("Don't have an account?"),
         TextButton(
           onPressed: () {
-            // Navigate to Sign Up
+            context.read<BottomNavigationBloc>().add(
+              UpdateIndex(3),
+            );
           },
-          child: Text('Sign up'),
+          child: const Text(
+            'Sign up',
+            style: TextStyle(
+              color: Color(0xFF65558F),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
         ),
       ],
     );
