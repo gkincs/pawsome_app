@@ -10,6 +10,7 @@ import 'package:pawsome_app/screens/expenses_history_screen.dart';
 import 'package:pawsome_app/screens/expenses_screen.dart';
 import 'package:pawsome_app/screens/first_step_screen.dart';
 import 'package:pawsome_app/screens/health_info_screen.dart';
+import 'package:pawsome_app/screens/home_screen.dart';
 import 'package:pawsome_app/screens/login_screen.dart';
 import 'package:pawsome_app/screens/medication_history_screen.dart';
 import 'package:pawsome_app/screens/new_account_screen.dart';
@@ -37,7 +38,7 @@ class ScreenManager extends StatelessWidget {
       NewAccountWidget(),
       FirststepWidget(),
       PetProfileWidget(),
-      //HomePageWidget(), - HIÁNYZÓ WIDGET !!!
+      HomeWidget(),
       PetScreenWidget(), 
       DiaryWidget(),
       NutritionDiaryWidget(),
@@ -66,8 +67,8 @@ class ScreenManager extends StatelessWidget {
         },
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.login), label: 'Login'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'New Account'),
+          BottomNavigationBarItem(icon: Icon(Icons.login), label: 'Pets'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Diary'),
           // Add other navigation items here
         ],
       ),
