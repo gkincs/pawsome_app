@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pawsome_app/bloc/bottom_navigation_bloc.dart';
 
 class LoginWidget extends StatefulWidget {
   const LoginWidget({super.key});
@@ -13,6 +11,7 @@ class _LoginWidgetState extends State<LoginWidget> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _rememberMe = false;
+  bool _showSignUp = false; // Az állapot, amely eldönti, hogy melyik widget jelenik meg
 
   @override
   void dispose() {
@@ -71,7 +70,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Text(
-                          'Login to your account',
+                          _showSignUp ? 'Create a new account' : 'Login to your account',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -80,23 +79,32 @@ class _LoginWidgetState extends State<LoginWidget> {
                           textAlign: TextAlign.center,
                         ),
                         SizedBox(height: 20),
-                        _buildTextField(
-                          _emailController,
-                          'Email',
-                          false,
-                          TextInputType.emailAddress,
-                        ),
+                        _showSignUp
+                            ? _buildTextField(
+                                _emailController,
+                                'Email',
+                                false,
+                                TextInputType.text,
+                              )
+                            : _buildTextField(
+                                _emailController,
+                                'Email',
+                                false,
+                                TextInputType.emailAddress,
+                              ),
                         SizedBox(height: 20),
                         _buildTextField(
                           _passwordController,
-                          'Password',
+                          _showSignUp ? 'Password' : 'Password',
                           true,
                           TextInputType.text,
                         ),
                         SizedBox(height: 10),
                         _buildRememberMeAndForgotPassword(),
                         SizedBox(height: 20),
-                        _buildLoginButton(),
+                        _showSignUp
+                            ? _buildSignUpButton()
+                            : _buildLoginButton(),
                         SizedBox(height: 20),
                         _buildSignUpSection(),
                       ],
@@ -169,19 +177,34 @@ class _LoginWidgetState extends State<LoginWidget> {
     );
   }
 
+  Widget _buildSignUpButton() {
+    return ElevatedButton(
+      onPressed: () {
+        // Add registration logic here
+      },
+      style: ElevatedButton.styleFrom(
+        padding: EdgeInsets.symmetric(vertical: 15),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
+      ),
+      child: Text('Sign Up'),
+    );
+  }
+
   Widget _buildSignUpSection() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text("Don't have an account?"),
+        Text(_showSignUp ? "Already have an account?" : "Don't have an account?"),
         TextButton(
           onPressed: () {
-            context.read<BottomNavigationBloc>().add(
-              UpdateIndex(3),
-            );
+            setState(() {
+              _showSignUp = !_showSignUp; // Az állapot váltása
+            });
           },
-          child: const Text(
-            'Sign up',
+          child: Text(
+            _showSignUp ? 'Login' : 'Sign up',
             style: TextStyle(
               color: Color(0xFF65558F),
               fontWeight: FontWeight.w500,
