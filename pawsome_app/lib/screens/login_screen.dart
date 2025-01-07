@@ -1,4 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pawsome_app/bloc/bottom_navigation_bloc.dart';
+import 'package:pawsome_app/screens/first_step_screen.dart';
 
 class LoginWidget extends StatefulWidget {
   const LoginWidget({super.key});
@@ -11,7 +15,6 @@ class _LoginWidgetState extends State<LoginWidget> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _rememberMe = false;
-  bool _showSignUp = false; // Az állapot, amely eldönti, hogy melyik widget jelenik meg
 
   @override
   void dispose() {
@@ -20,27 +23,47 @@ class _LoginWidgetState extends State<LoginWidget> {
     super.dispose();
   }
 
-  void _performLogin() {
-    final email = _emailController.text;
-    final password = _passwordController.text;
+void _performLogin() async {
+  final email = _emailController.text.trim();
+  final password = _passwordController.text.trim();
 
-    if (email.isEmpty || password.isEmpty) {
-      _showMessage('Please fill in both fields.');
-      return;
-    }
-
-    // if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+\$').hasMatch(email)) {
-    //   _showMessage('Please enter a valid email address.');
-    //   return;
-    // }
-
-    // Simulated login logic
-    if (email == 'user@example.com' && password == 'password123') {
-      _showMessage('Login successful!', success: true);
-    } else {
-      _showMessage('Invalid email or password.');
-    }
+  if (email.isEmpty || password.isEmpty) {
+    _showMessage('Please fill in both fields.');
+    return;
   }
+
+  try {
+    final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    
+    if (!mounted) return;  // Add mounted check here
+    
+    if (credential.user != null) {
+      _showMessage('Login successful!', success: true);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const FirststepWidget(),
+        ),
+      );
+    }
+  } on FirebaseAuthException catch (e) {
+    if (!mounted) return;  // Add mounted check here
+    
+    if (e.code == 'user-not-found') {
+      _showMessage('No user found for that email.');
+    } else if (e.code == 'wrong-password') {
+      _showMessage('Wrong password provided.');
+    } else {
+      _showMessage('Login failed. Please try again.');
+    }
+  } catch (e) {
+    if (!mounted) return;  // Add mounted check here
+    _showMessage('An error occurred. Please try again later.');
+  }
+}
 
   void _showMessage(String message, {bool success = false}) {
     final color = success ? Colors.green : Colors.red;
@@ -69,8 +92,8 @@ class _LoginWidgetState extends State<LoginWidget> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Text(
-                          _showSignUp ? 'Create a new account' : 'Login to your account',
+                        const Text(
+                          'Login to your account',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -78,34 +101,25 @@ class _LoginWidgetState extends State<LoginWidget> {
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        SizedBox(height: 20),
-                        _showSignUp
-                            ? _buildTextField(
-                                _emailController,
-                                'Email',
-                                false,
-                                TextInputType.text,
-                              )
-                            : _buildTextField(
-                                _emailController,
-                                'Email',
-                                false,
-                                TextInputType.emailAddress,
-                              ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
+                        _buildTextField(
+                          _emailController,
+                          'Email',
+                          false,
+                          TextInputType.emailAddress,
+                        ),
+                        const SizedBox(height: 20),
                         _buildTextField(
                           _passwordController,
-                          _showSignUp ? 'Password' : 'Password',
+                          'Password',
                           true,
                           TextInputType.text,
                         ),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
                         _buildRememberMeAndForgotPassword(),
-                        SizedBox(height: 20),
-                        _showSignUp
-                            ? _buildSignUpButton()
-                            : _buildLoginButton(),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
+                        _buildLoginButton(),
+                        const SizedBox(height: 20),
                         _buildSignUpSection(),
                       ],
                     ),
@@ -132,7 +146,7 @@ class _LoginWidgetState extends State<LoginWidget> {
       textInputAction: isPassword ? TextInputAction.done : TextInputAction.next,
       decoration: InputDecoration(
         labelText: label,
-        border: OutlineInputBorder(),
+        border: const OutlineInputBorder(),
       ),
     );
   }
@@ -151,14 +165,14 @@ class _LoginWidgetState extends State<LoginWidget> {
                 });
               },
             ),
-            Text('Remember me'),
+            const Text('Remember me'),
           ],
         ),
         TextButton(
           onPressed: () {
             // Forgot password logic
           },
-          child: Text('Forgot password?'),
+          child: const Text('Forgot password?'),
         ),
       ],
     );
@@ -168,27 +182,14 @@ class _LoginWidgetState extends State<LoginWidget> {
     return ElevatedButton(
       onPressed: _performLogin,
       style: ElevatedButton.styleFrom(
-        padding: EdgeInsets.symmetric(vertical: 15),
+        backgroundColor: const Color(0xFF65558F),
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(vertical: 15),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30),
         ),
       ),
-      child: Text('Login'),
-    );
-  }
-
-  Widget _buildSignUpButton() {
-    return ElevatedButton(
-      onPressed: () {
-        // Add registration logic here
-      },
-      style: ElevatedButton.styleFrom(
-        padding: EdgeInsets.symmetric(vertical: 15),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30),
-        ),
-      ),
-      child: Text('Sign Up'),
+      child: const Text('Login'),
     );
   }
 
@@ -196,15 +197,13 @@ class _LoginWidgetState extends State<LoginWidget> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(_showSignUp ? "Already have an account?" : "Don't have an account?"),
+        const Text("Don't have an account?"),
         TextButton(
           onPressed: () {
-            setState(() {
-              _showSignUp = !_showSignUp; // Az állapot váltása
-            });
+            context.read<BottomNavigationBloc>().add(UpdateContent(2));
           },
-          child: Text(
-            _showSignUp ? 'Login' : 'Sign up',
+          child: const Text(
+            'Sign up',
             style: TextStyle(
               color: Color(0xFF65558F),
               fontWeight: FontWeight.w500,

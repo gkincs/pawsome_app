@@ -44,7 +44,7 @@ class ScreenManager extends StatelessWidget {
       FirststepWidget(),
       PetProfileWidget(),
       HomeWidget(),
-      PetScreenWidget(), 
+      PetScreenWidget(),
       DiaryWidget(),
       NutritionDiaryWidget(),
       NutritionHistoryWidget(),
@@ -71,7 +71,7 @@ class ScreenManager extends StatelessWidget {
         },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.login), label: 'Pets'),
+          BottomNavigationBarItem(icon: Icon(Icons.pets), label: 'Pets'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Diary'),
           // Add other navigation items here
         ],

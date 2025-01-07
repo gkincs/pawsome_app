@@ -36,7 +36,7 @@ class _NewAccountWidgetState extends State<NewAccountWidget> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                Text(
+                const Text(
                   'Create a new account',
                   style: TextStyle(
                     fontSize: 26,
@@ -45,21 +45,26 @@ class _NewAccountWidgetState extends State<NewAccountWidget> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: 60),
+                const SizedBox(height: 60),
                 _buildInputField(_fullNameController, 'Full name'),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 _buildInputField(_emailController, 'Email', keyboardType: TextInputType.emailAddress),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 _buildInputField(_passwordController, 'Password', isPassword: true),
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
                 ElevatedButton(
                   onPressed: _createAccount,
                   style: ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 48),
+                    backgroundColor: const Color(0xFF65558F),
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(double.infinity, 48),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
                   ),
-                  child: Text('Create Account'),
+                  child: const Text('Create Account'),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 _buildSignInText(),
               ],
             ),
@@ -81,7 +86,7 @@ class _NewAccountWidgetState extends State<NewAccountWidget> {
       keyboardType: keyboardType,
       decoration: InputDecoration(
         labelText: label,
-        border: OutlineInputBorder(),
+        border: const OutlineInputBorder(),
       ),
     );
   }
@@ -90,20 +95,20 @@ class _NewAccountWidgetState extends State<NewAccountWidget> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
+        const Text(
           'Already have an account? ',
           style: TextStyle(color: Colors.black, fontSize: 14),
         ),
         TextButton(
           onPressed: () {
-            context.read<BottomNavigationBloc>().add(UpdateIndex(0));
+            context.read<BottomNavigationBloc>().add(UpdateContent(1));
           },
-          child: Text(
+          child: const Text(
             'Sign in',
             style: TextStyle(
-              color: Color(0xFF673AB7),
+              color: Color(0xFF65558F),
               fontSize: 14,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ),
@@ -132,9 +137,9 @@ class _NewAccountWidgetState extends State<NewAccountWidget> {
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Account created successfully!')),
+            const SnackBar(content: Text('Account created successfully!')),
           );
-          context.read<BottomNavigationBloc>().add(UpdateIndex(0));
+          context.read<BottomNavigationBloc>().add(UpdateContent(1));
         }
       } catch (e) {
         if (mounted) {
@@ -146,7 +151,7 @@ class _NewAccountWidgetState extends State<NewAccountWidget> {
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Please fill out all fields!')),
+          const SnackBar(content: Text('Please fill out all fields!')),
         );
       }
     }
