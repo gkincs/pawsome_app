@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pawsome_app/bloc/bottom_navigation_bloc.dart';
+import 'package:pawsome_app/screens/pet_prof_screen.dart';
 
-class FirststepWidget extends StatefulWidget {
+class FirststepWidget extends StatelessWidget {
   const FirststepWidget({super.key});
 
-  @override
-  _FirststepWidgetState createState() => _FirststepWidgetState();
-}
-
-class _FirststepWidgetState extends State<FirststepWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,10 +24,10 @@ class _FirststepWidgetState extends State<FirststepWidget> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         _buildTitle(),
-                        SizedBox(height: 40),
+                        const SizedBox(height: 120),
                         _buildSubtitle(),
-                        SizedBox(height: 40),
-                        _buildAddButton(),
+                        const SizedBox(height: 40),
+                        _buildAddButton(context),
                       ],
                     ),
                   ),
@@ -43,7 +41,7 @@ class _FirststepWidgetState extends State<FirststepWidget> {
   }
 
   Widget _buildTitle() {
-    return Text(
+    return const Text(
       'PawSome',
       style: TextStyle(
         fontSize: 26,
@@ -55,8 +53,8 @@ class _FirststepWidgetState extends State<FirststepWidget> {
   }
 
   Widget _buildSubtitle() {
-    return Text(
-      'Add your first pet',
+    return const Text(
+      'Add your first pet!',
       textAlign: TextAlign.center,
       style: TextStyle(
         fontSize: 24,
@@ -66,20 +64,24 @@ class _FirststepWidgetState extends State<FirststepWidget> {
     );
   }
 
-  Widget _buildAddButton() {
+  Widget _buildAddButton(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        // Add button action
+        context.read<BottomNavigationBloc>().add(UpdateContent(1)); // Frissíti a BLoC állapotát
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => PetProfileWidget()),
+        );
       },
       style: ElevatedButton.styleFrom(
-        minimumSize: Size(double.infinity, 48),
-        //backgroundColor: Color.fromRGBO(78, 130, 255, 0.9),
-        //foregroundColor: Colors.white,
+        backgroundColor: const Color(0xFFEADDFF),
+        foregroundColor: Colors.black,
+        padding: const EdgeInsets.symmetric(vertical: 15),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(100),
+          borderRadius: BorderRadius.circular(30),
         ),
       ),
-      child: Text('Add'),
+      child: const Text('Add'),
     );
   }
 }

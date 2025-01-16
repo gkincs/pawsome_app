@@ -1,6 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:pawsome_app/bloc/bottom_navigation_bloc.dart';
+import 'package:pawsome_app/screens/home_screen.dart';
 
 class PetProfileWidget extends StatefulWidget {
   const PetProfileWidget({super.key});
@@ -35,6 +39,50 @@ class _PetProfileWidgetState extends State<PetProfileWidget> {
       });
     }
   }
+
+Future<void> _savePetProfile() async {
+  final String name = _nameController.text.trim();
+  if (name.isEmpty || _selectedSpecies == null || _selectedBreed == null || _selectedDate == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Please fill out all fields.')),
+    );
+    return;
+  }
+
+  // Generáljon egy egyedi azonosítót
+  String petId = FirebaseFirestore.instance.collection('pets').doc().id;
+
+  final Map<String, dynamic> petData = {
+    'petId': petId,
+    'name': name,
+    'animalType': _selectedSpecies,
+    'breed': _selectedBreed,
+    'age': DateTime.now().year - _selectedDate!.year,
+    'gender': _isFemale ? 'Female' : 'Male',
+  };
+
+  try {
+    // Használja a set() metódust az add() helyett
+    await FirebaseFirestore.instance.collection('pets').doc(petId).set(petData);
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Pet profile saved successfully!')),
+    );
+    // Clear fields after saving
+    setState(() {
+      _nameController.clear();
+      _selectedSpecies = null;
+      _selectedBreed = null;
+      _selectedDate = null;
+      _isFemale = true;
+      _image = null;
+    });
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Failed to save pet profile: $e')),
+    );
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +130,7 @@ class _PetProfileWidgetState extends State<PetProfileWidget> {
               const SizedBox(height: 24),
               _buildGenderSelector(),
               const SizedBox(height: 24),
-              _buildSaveButton(),
+              _buildSaveButton(context),
             ],
           ),
         ),
@@ -209,7 +257,7 @@ class _PetProfileWidgetState extends State<PetProfileWidget> {
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
-                  color: _isFemale ? Colors.blue : null,
+                  color: _isFemale ? Color(0xFF65558F): null,
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(8),
                     bottomLeft: Radius.circular(8),
@@ -235,7 +283,7 @@ class _PetProfileWidgetState extends State<PetProfileWidget> {
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
-                  color: !_isFemale ? Colors.blue : null,
+                  color: !_isFemale ? const Color(0xFF65558F): null,
                   borderRadius: const BorderRadius.only(
                     topRight: Radius.circular(8),
                     bottomRight: Radius.circular(8),
@@ -260,17 +308,40 @@ class _PetProfileWidgetState extends State<PetProfileWidget> {
     );
   }
 
-  Widget _buildSaveButton() {
+  // Widget _buildSaveButton() {
+  //   return ElevatedButton(
+  //     onPressed: _savePetProfile,
+  //     style: ElevatedButton.styleFrom(
+  //       backgroundColor: const Color(0xFF65558F),
+  //       padding: const EdgeInsets.symmetric(vertical: 16),
+  //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+  //     ),
+  //     child: const Text('Save', style: TextStyle(color: Colors.white, fontSize: 16)),
+  //   );
+  // }
+
+
+  Widget _buildSaveButton(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {
-        // Implement save functionality
+      onPressed: () async {
+        await _savePetProfile(); // Várjuk meg a mentés befejezését
+        if (!mounted) return; // Ellenőrizzük, hogy a widget még mindig a fában van-e
+
+        context.read<BottomNavigationBloc>().add(UpdateContent(1)); // Frissíti a BLoC állapotát
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomeWidget()),
+        );
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.blue,
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+        backgroundColor: const Color(0xFFEADDFF),
+        foregroundColor: Colors.black,
+        padding: const EdgeInsets.symmetric(vertical: 15),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
       ),
-      child: const Text('Save', style: TextStyle(color: Colors.white, fontSize: 16)),
+      child: const Text('Save'),
     );
   }
 }

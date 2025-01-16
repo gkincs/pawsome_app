@@ -26,56 +26,47 @@ class ScreenManager extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Az aktuális index lekérése a Bloc állapotából
-    final currentIndex = context.select(
-      (BottomNavigationBloc bloc) => bloc.state.currentIndex,
-    );
-
-    // Az aktuális tartalom indexének lekérése a Bloc állapotából
-    final contentIndex = context.select(
-      (BottomNavigationBloc bloc) => bloc.state.contentIndex,
-    );
-
-    // A képernyők listája
-    final List<Widget> screens = [
-      SigninWidget(),
-      LoginWidget(),
-      NewAccountWidget(),
-      FirststepWidget(),
-      PetProfileWidget(),
-      HomeWidget(),
-      PetScreenWidget(),
-      DiaryWidget(),
-      NutritionDiaryWidget(),
-      NutritionHistoryWidget(),
-      ActivityScreenWidget(),
-      ActivityHistoryWidget(),
-      ExpensesWidget(),
-      ExpensesHistoryWidget(),
-      AppointmentWidget(),
-      AppointmentHistoryWidget(),
-      HealthInfoWidget(),
-      MedicationHistoryWidget()
-      // Add other screens here
-    ];
-
-    return Scaffold(
-      body: IndexedStack(
-        index: contentIndex, // Csak a tartalom frissül
-        children: screens,
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: currentIndex, // A navbar indexe nem változik
-        onTap: (index) {
-          context.read<BottomNavigationBloc>().add(UpdateIndex(index)); // Frissítjük a navbar indexét
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.pets), label: 'Pets'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Diary'),
-          // Add other navigation items here
-        ],
-      ),
+    return BlocBuilder<BottomNavigationBloc, BottomNavigationState>(
+      builder: (context, state) {
+        return Scaffold(
+          body: IndexedStack(
+            index: state.contentIndex,
+            children: [
+              SigninWidget(),
+              LoginWidget(),
+              NewAccountWidget(),
+              FirststepWidget(),
+              PetProfileWidget(),
+              HomeWidget(),
+              PetScreenWidget(),
+              DiaryWidget(),
+              NutritionDiaryWidget(),
+              NutritionHistoryWidget(),
+              ActivityScreenWidget(),
+              ActivityHistoryWidget(),
+              ExpensesWidget(),
+              ExpensesHistoryWidget(),
+              AppointmentWidget(),
+              AppointmentHistoryWidget(),
+              HealthInfoWidget(),
+              MedicationHistoryWidget(),
+            ],
+          ),
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: state.currentIndex,
+            onTap: (index) {
+              context.read<BottomNavigationBloc>().add(UpdateIndex(index));
+              context.read<BottomNavigationBloc>().add(UpdateContent(index));
+            },
+            items: const [
+              BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+              BottomNavigationBarItem(icon: Icon(Icons.pets), label: 'Pets'),
+              BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Diary'),
+              // További navigációs elemek itt
+            ],
+          ),
+        );
+      },
     );
   }
 }

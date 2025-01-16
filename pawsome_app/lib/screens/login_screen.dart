@@ -182,7 +182,7 @@ void _performLogin() async {
     return ElevatedButton(
       onPressed: _performLogin,
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF65558F),
+        backgroundColor: const Color(0xFFEADDFF),
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(vertical: 15),
         shape: RoundedRectangleBorder(
