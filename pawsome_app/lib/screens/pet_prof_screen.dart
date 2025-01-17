@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -21,6 +22,7 @@ class _PetProfileWidgetState extends State<PetProfileWidget> {
   bool _isFemale = true;
   XFile? _image;
   final ImagePicker _picker = ImagePicker();
+  String? _userId;
 
   final List<String> _species = ['Dog', 'Cat', 'Bird', 'Fish', 'Other'];
   final Map<String, List<String>> _breeds = {
@@ -31,6 +33,21 @@ class _PetProfileWidgetState extends State<PetProfileWidget> {
     'Other': ['Hamster', 'Rabbit', 'Guinea Pig', 'Ferret'],
   };
 
+  @override
+  void initState() {
+    super.initState();
+    _getUserId();
+  }
+
+  Future<void> _getUserId() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      setState(() {
+        _userId = user.uid;
+      });
+    }
+  }
+
   Future<void> _pickImage() async {
     final XFile? selectedImage = await _picker.pickImage(source: ImageSource.gallery);
     if (selectedImage != null) {
@@ -40,49 +57,56 @@ class _PetProfileWidgetState extends State<PetProfileWidget> {
     }
   }
 
-Future<void> _savePetProfile() async {
-  final String name = _nameController.text.trim();
-  if (name.isEmpty || _selectedSpecies == null || _selectedBreed == null || _selectedDate == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Please fill out all fields.')),
-    );
-    return;
+  Future<void> _savePetProfile() async {
+    if (_userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User not logged in.')),
+      );
+      return;
+    }
+
+    final String name = _nameController.text.trim();
+    if (name.isEmpty || _selectedSpecies == null || _selectedBreed == null || _selectedDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill out all fields.')),
+      );
+      return;
+    }
+
+    // Egy egyedi azonosítót
+    String petId = FirebaseFirestore.instance.collection('pets').doc().id;
+
+    final Map<String, dynamic> petData = {
+      'petId': petId,
+      'name': name,
+      'animalType': _selectedSpecies,
+      'breed': _selectedBreed,
+      'age': DateTime.now().year - _selectedDate!.year,
+      'gender': _isFemale ? 'Female' : 'Male',
+      'userId': _userId,  // Felhasználó ID-ja
+    };
+
+    try {
+      await FirebaseFirestore.instance.collection('pets').doc(petId).set(petData);
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Pet profile saved successfully!')),
+      );
+      // Clear fields after saving
+      setState(() {
+        _nameController.clear();
+        _selectedSpecies = null;
+        _selectedBreed = null;
+        _selectedDate = null;
+        _isFemale = true;
+        _image = null;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to save pet profile: $e')),
+      );
+    }
   }
-
-  // Generáljon egy egyedi azonosítót
-  String petId = FirebaseFirestore.instance.collection('pets').doc().id;
-
-  final Map<String, dynamic> petData = {
-    'petId': petId,
-    'name': name,
-    'animalType': _selectedSpecies,
-    'breed': _selectedBreed,
-    'age': DateTime.now().year - _selectedDate!.year,
-    'gender': _isFemale ? 'Female' : 'Male',
-  };
-
-  try {
-    // Használja a set() metódust az add() helyett
-    await FirebaseFirestore.instance.collection('pets').doc(petId).set(petData);
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Pet profile saved successfully!')),
-    );
-    // Clear fields after saving
-    setState(() {
-      _nameController.clear();
-      _selectedSpecies = null;
-      _selectedBreed = null;
-      _selectedDate = null;
-      _isFemale = true;
-      _image = null;
-    });
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Failed to save pet profile: $e')),
-    );
-  }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -283,7 +307,7 @@ Future<void> _savePetProfile() async {
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
-                  color: !_isFemale ? const Color(0xFF65558F): null,
+                  color: !_isFemale ? Color(0xFF65558F) : null,
                   borderRadius: const BorderRadius.only(
                     topRight: Radius.circular(8),
                     bottomRight: Radius.circular(8),
@@ -307,19 +331,6 @@ Future<void> _savePetProfile() async {
       ),
     );
   }
-
-  // Widget _buildSaveButton() {
-  //   return ElevatedButton(
-  //     onPressed: _savePetProfile,
-  //     style: ElevatedButton.styleFrom(
-  //       backgroundColor: const Color(0xFF65558F),
-  //       padding: const EdgeInsets.symmetric(vertical: 16),
-  //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-  //     ),
-  //     child: const Text('Save', style: TextStyle(color: Colors.white, fontSize: 16)),
-  //   );
-  // }
-
 
   Widget _buildSaveButton(BuildContext context) {
     return ElevatedButton(

@@ -3,9 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pawsome_app/bloc/bottom_navigation_bloc.dart';
 import 'package:pawsome_app/screens/pet_prof_screen.dart';
 
-class FirststepWidget extends StatelessWidget {
-  const FirststepWidget({super.key});
+class FirststepWidget extends StatefulWidget {
+  const FirststepWidget({Key? key}) : super(key: key);
 
+  @override
+  _FirststepWidgetState createState() => _FirststepWidgetState();
+}
+
+class _FirststepWidgetState extends State<FirststepWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,7 +72,8 @@ class FirststepWidget extends StatelessWidget {
   Widget _buildAddButton(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        context.read<BottomNavigationBloc>().add(UpdateContent(1)); // Frissíti a BLoC állapotát
+        // State frissítése BLoC segítségével
+        context.read<BottomNavigationBloc>().add(UpdateContent(1));
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => PetProfileWidget()),

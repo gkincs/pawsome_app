@@ -52,19 +52,29 @@ class ScreenManager extends StatelessWidget {
               MedicationHistoryWidget(),
             ],
           ),
-          bottomNavigationBar: BottomNavigationBar(
-            currentIndex: state.currentIndex,
-            onTap: (index) {
-              context.read<BottomNavigationBloc>().add(UpdateIndex(index));
-              context.read<BottomNavigationBloc>().add(UpdateContent(index));
-            },
-            items: const [
-              BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-              BottomNavigationBarItem(icon: Icon(Icons.pets), label: 'Pets'),
-              BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Diary'),
-              // További navigációs elemek itt
-            ],
-          ),
+          bottomNavigationBar: BottomNavigationBarWidget(), // Itt lesz a BottomNavigationBar
+        );
+      },
+    );
+  }
+}
+
+class BottomNavigationBarWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<BottomNavigationBloc, BottomNavigationState>(
+      builder: (context, state) {
+        return BottomNavigationBar(
+          currentIndex: state.currentIndex,
+          onTap: (index) {
+            context.read<BottomNavigationBloc>().add(UpdateIndex(index));
+            context.read<BottomNavigationBloc>().add(UpdateContent(index));
+          },
+          items: const [
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+            BottomNavigationBarItem(icon: Icon(Icons.pets), label: 'Pets'),
+            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Diary'),
+          ],
         );
       },
     );
