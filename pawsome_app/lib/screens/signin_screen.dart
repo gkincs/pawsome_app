@@ -68,41 +68,22 @@ class _SigninWidgetState extends State<SigninWidget> {
   }
 
   Widget _buildSignInButton(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () async {
-        setState(() {
-          _isSigningIn = true; // Indikátor megjelenítése
-        });
-
-        try {
-          UserCredential userCredential = await FirebaseAuth.instance.signInAnonymously();
-
-          if (userCredential.user != null) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const LoginWidget()),
-            );
-          }
-        } catch (e) {
-          print('Sign-in failed: ${e.toString()}'); // Nyomtatjuk a hibát
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Sign-in failed: ${e.toString()}')),
-          );
-        } finally {
-          setState(() {
-            _isSigningIn = false; // Visszaállítjuk a státuszt
-          });
-        }
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFFEADDFF),
-        foregroundColor: const Color(0xFF65558F),
-        minimumSize: const Size(double.infinity, 48),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+  return ElevatedButton(
+    onPressed: () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginWidget()),
+      );
+    },
+    style: ElevatedButton.styleFrom(
+      backgroundColor: const Color(0xFFEADDFF),
+      foregroundColor: const Color(0xFF65558F),
+      minimumSize: const Size(double.infinity, 48),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
       ),
-      child: const Text('Sign in'),
-    );
-  }
+    ),
+    child: const Text('Sign in'),
+  );
+}
 }

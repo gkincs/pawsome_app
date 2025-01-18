@@ -1,22 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pawsome_app/bloc/auth_bloc.dart';
 import 'package:pawsome_app/bloc/bottom_navigation_bloc.dart';
-import 'screens/screen_manager.dart';
+import 'package:pawsome_app/repositories/user_repository.dart';
+import 'package:pawsome_app/screens/signin_screen.dart';
+import 'package:pawsome_app/screens/first_step_screen.dart';
+import 'package:pawsome_app/screens/home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(
-    MultiBlocProvider(
-      providers: [
-        BlocProvider<BottomNavigationBloc>(
-          create: (context) => BottomNavigationBloc(),
-        ),
-      ],
-      child: const Pawsome(),
-    ),
-  );
+  runApp(const Pawsome());
 }
 
 class Pawsome extends StatelessWidget {
@@ -24,10 +19,32 @@ class Pawsome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        body: ScreenManager(),
-        bottomNavigationBar: BottomNavigationBarWidget(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthBloc>(
+          create: (context) => AuthBloc(UserRepository()),
+        ),
+        BlocProvider<BottomNavigationBloc>(
+          create: (context) => BottomNavigationBloc(),
+        ),
+      ],
+      child: MaterialApp(
+        home: BlocBuilder<AuthBloc, AuthState>(
+          builder: (context, state) {
+            if (state.isLoading) {
+              return const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              );
+            }
+            if (state.user == null) {
+              return const SigninWidget();
+            }
+            if (state.isFirstLogin) {
+              return const FirststepWidget();
+            }
+            return const HomeWidget();
+          },
+        ),
       ),
     );
   }

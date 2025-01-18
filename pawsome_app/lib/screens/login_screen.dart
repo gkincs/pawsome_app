@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pawsome_app/bloc/bottom_navigation_bloc.dart';
+import 'package:pawsome_app/screens/first_step_screen.dart';
 import 'package:pawsome_app/screens/home_screen.dart';
 
 class LoginWidget extends StatefulWidget {
@@ -16,6 +17,7 @@ class _LoginWidgetState extends State<LoginWidget> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _rememberMe = false;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -24,12 +26,19 @@ class _LoginWidgetState extends State<LoginWidget> {
     super.dispose();
   }
 
-  void _performLogin() async {
+  Future<void> _performLogin() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
       _showMessage('Please fill in both fields.');
+      setState(() {
+        _isLoading = false;
+      });
       return;
     }
 
@@ -40,14 +49,22 @@ class _LoginWidgetState extends State<LoginWidget> {
       );
 
       if (!mounted) return;
-
+      
       if (credential.user != null) {
         _showMessage('Login successful!', success: true);
 
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomeWidget()),
-        );
+        bool isFirstLogin = await _isFirstLogin(credential.user!.uid);
+        if (isFirstLogin) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const FirststepWidget()),
+          );
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomeWidget()),
+          );
+        }
       }
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
@@ -62,6 +79,26 @@ class _LoginWidgetState extends State<LoginWidget> {
     } catch (e) {
       if (!mounted) return;
       _showMessage('An error occurred. Please try again later.');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<bool> _isFirstLogin(String userId) async {
+    try {
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+
+      return !userDoc.exists;
+    } catch (e) {
+      debugPrint('Error checking first login: $e');
+      return false;
     }
   }
 
@@ -180,7 +217,7 @@ class _LoginWidgetState extends State<LoginWidget> {
 
   Widget _buildLoginButton() {
     return ElevatedButton(
-      onPressed: _performLogin,
+      onPressed: _isLoading ? null : _performLogin,
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFFEADDFF),
         foregroundColor: Colors.white,
@@ -189,7 +226,9 @@ class _LoginWidgetState extends State<LoginWidget> {
           borderRadius: BorderRadius.circular(30),
         ),
       ),
-      child: const Text('Login'),
+      child: _isLoading
+          ? const CircularProgressIndicator(color: Colors.white)
+          : const Text('Login'),
     );
   }
 

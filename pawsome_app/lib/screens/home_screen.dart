@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pawsome_app/bloc/bottom_navigation_bloc.dart';
+import 'package:pawsome_app/screens/login_screen.dart';
 import 'package:pawsome_app/screens/pet_screen.dart';
 
 class Pet {
@@ -61,6 +62,17 @@ class _HomeWidgetState extends State<HomeWidget> {
     }
   }
 
+  Future<void> _logout() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const LoginWidget()),
+      );
+    } catch (e) {
+      print('Error during logout: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<BottomNavigationBloc, BottomNavigationState>(
@@ -83,36 +95,55 @@ class _HomeWidgetState extends State<HomeWidget> {
     );
   }
 
-  Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {},
-            color: const Color(0xFF65558F),
-          ),
-          const Expanded(
-            child: Text(
-              'PawSome',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w500,
-                color: Colors.black,
-              ),
+ Widget _buildHeader() {
+  return Container(
+    padding: const EdgeInsets.all(16),
+    child: Row(
+      children: [
+        IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {},
+          color: const Color(0xFF65558F),
+        ),
+        const Expanded(
+          child: Text(
+            'PawSome',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w500,
+              color: Colors.black,
             ),
           ),
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {},
-            color: Colors.black,
-          ),
-        ],
-      ),
-    );
-  }
+        ),
+        PopupMenuButton<String>(
+          icon: const Icon(Icons.settings, color: Colors.black),
+          onSelected: (value) async {
+            if (value == 'logout') {
+              try {
+                await FirebaseAuth.instance.signOut();
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => const LoginWidget()),
+                );
+              } catch (e) {
+                print('Error during logout: $e');
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Logout failed: $e')),
+                );
+              }
+            }
+          },
+          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+            const PopupMenuItem<String>(
+              value: 'logout',
+              child: Text('Logout'),
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
+}
 
   Widget _buildPetsSection() {
     return Expanded(

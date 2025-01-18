@@ -5,7 +5,7 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Felhasználó bejelentkezése
+  // User login
   Future<User?> loginUser(String email, String password) async {
     try {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
@@ -26,12 +26,23 @@ class AuthService {
     }
   }
 
-  // Felhasználó adatainak mentése a Firestore-ba, kisállatok hivatkozásával
+//First login?
+Future<bool> isFirstLogin(String userId) async {
+  try {
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .get();
+    return !userDoc.exists;
+  } catch (e) {
+    throw Exception("Failed to check first login status: ${e.toString()}");
+  }
+}
+  // Save user data to Firestore, with pet references
   Future<void> saveUserData(String uid, String email, String name, List<String> petIds) async {
     try {
-      // Pet ID-k listázása dokumentum referenciák formájában
       List<DocumentReference> petRefs = petIds.isEmpty
-          ? [] // Ha nincs kisállat, akkor üres lista
+          ? []
           : petIds.map((petId) => _firestore.collection('pets').doc(petId)).toList();
 
       DocumentSnapshot userDoc = await _firestore.collection('users').doc(uid).get();
@@ -57,7 +68,7 @@ class AuthService {
     }
   }
 
-  // Kisállat hozzáadása egy felhasználóhoz
+  // Add a pet to a user
   Future<void> addPetToUser(String userId, String petId) async {
     try {
       DocumentReference petRef = _firestore.collection('pets').doc(petId);
@@ -74,6 +85,15 @@ class AuthService {
       throw Exception("Failed to add pet to user: ${e.message}");
     } catch (e) {
       throw Exception("An unknown error occurred: ${e.toString()}");
+    }
+  }
+
+  // Logout user
+  Future<void> logoutUser() async {
+    try {
+      await _auth.signOut();
+    } catch (e) {
+      throw Exception("Logout failed: ${e.toString()}");
     }
   }
 }

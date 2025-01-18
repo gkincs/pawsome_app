@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pawsome_app/bloc/bottom_navigation_bloc.dart';
 import 'package:pawsome_app/screens/pet_prof_screen.dart';
 
 class FirststepWidget extends StatefulWidget {
-  const FirststepWidget({Key? key}) : super(key: key);
+  const FirststepWidget({super.key});
 
   @override
   _FirststepWidgetState createState() => _FirststepWidgetState();
 }
 
 class _FirststepWidgetState extends State<FirststepWidget> {
+  bool _isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,11 +72,9 @@ class _FirststepWidgetState extends State<FirststepWidget> {
   Widget _buildAddButton(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        // State frissítése BLoC segítségével
-        context.read<BottomNavigationBloc>().add(UpdateContent(1));
-        Navigator.push(
+        Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => PetProfileWidget(petId: null,)),
+          MaterialPageRoute(builder: (context) => PetProfileWidget(petId: null)),
         );
       },
       style: ElevatedButton.styleFrom(

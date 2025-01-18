@@ -1,24 +1,32 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../services/auth_service.dart';
+import '../repositories/user_repository.dart';
 
-// AuthBloc állapotok
+// Define AuthState
 class AuthState {
   final bool isLoading;
   final User? user;
   final String? errorMessage;
+  final bool isFirstLogin;
 
-  AuthState({this.isLoading = false, this.user, this.errorMessage});
+  AuthState({
+    this.isLoading = false,
+    this.user,
+    this.errorMessage,
+    this.isFirstLogin = false,
+  });
 }
 
-// AuthBloc események
-class AuthEvent {
+// Define AuthEvent
+abstract class AuthEvent {}
+
+class LoginEvent extends AuthEvent {
   final String email;
   final String password;
   final String name;
   final List<String> petIds;
 
-  AuthEvent({
+  LoginEvent({
     required this.email,
     required this.password,
     required this.name,
@@ -26,43 +34,44 @@ class AuthEvent {
   });
 }
 
-class AuthBloc extends Cubit<AuthState> {
-  final AuthService _authService;
+class LogoutEvent extends AuthEvent {}
 
-  AuthBloc(this._authService) : super(AuthState());
+class AuthBloc extends Bloc<AuthEvent, AuthState> {
+  final UserRepository _userRepository;
 
-  // Bejelentkezés
-  Future<void> login(AuthEvent event) async {
+  AuthBloc(this._userRepository) : super(AuthState()) {
+    on<LoginEvent>(_onLogin);
+    on<LogoutEvent>(_onLogout);
+  }
+
+  Future<void> _onLogin(LoginEvent event, Emitter<AuthState> emit) async {
     try {
-      emit(AuthState(isLoading: true));  // Betöltési állapot
+      emit(AuthState(isLoading: true));
 
-      // Bejelentkezés a Firebase-be
-      User? user = await _authService.loginUser(event.email, event.password);
-
+      User? user = await _userRepository.signIn(event.email, event.password);
       if (user != null) {
-        // Adatok mentése a Firestore-ba
-        await _authService.saveUserData(
+        bool isFirstLogin = await _userRepository.isFirstLogin(user.uid);
+        await _userRepository.saveUserData(
           user.uid,
           event.email,
           event.name,
           event.petIds,
         );
-        emit(AuthState(user: user));  // Sikeres bejelentkezés
+        emit(AuthState(user: user, isFirstLogin: isFirstLogin));
       } else {
-        emit(AuthState(errorMessage: "Bejelentkezés sikertelen"));
+        emit(AuthState(errorMessage: "Login failed"));
       }
     } catch (e) {
-      emit(AuthState(errorMessage: e.toString()));  // Hiba esetén
+      emit(AuthState(errorMessage: e.toString()));
     }
   }
 
-  // // Kijelentkezés
-  // Future<void> logout() async {
-  //   try {
-  //     await _authService.logoutUser();
-  //     emit(AuthState());  // Visszaállítjuk az alapállapotot
-  //   } catch (e) {
-  //     emit(AuthState(errorMessage: e.toString()));
-  //   }
-  // }
+  Future<void> _onLogout(LogoutEvent event, Emitter<AuthState> emit) async {
+    try {
+      await _userRepository.signOut();
+      emit(AuthState());
+    } catch (e) {
+      emit(AuthState(errorMessage: e.toString()));
+    }
+  }
 }
