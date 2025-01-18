@@ -76,7 +76,7 @@ class _FirststepWidgetState extends State<FirststepWidget> {
         context.read<BottomNavigationBloc>().add(UpdateContent(1));
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => PetProfileWidget()),
+          MaterialPageRoute(builder: (context) => PetProfileWidget(petId: null,)),
         );
       },
       style: ElevatedButton.styleFrom(

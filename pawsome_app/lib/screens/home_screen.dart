@@ -1,9 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pawsome_app/bloc/bottom_navigation_bloc.dart';
 import 'package:pawsome_app/screens/pet_screen.dart';
-import 'package:pawsome_app/screens/screen_manager.dart';
 
 class Pet {
   final String name;
@@ -13,8 +13,8 @@ class Pet {
 
   factory Pet.fromFirestore(DocumentSnapshot doc) {
     return Pet(
-      name: doc['name'],
-      breed: doc['breed'],
+      name: doc['name'] ?? '',
+      breed: doc['breed'] ?? '',
     );
   }
 }
@@ -29,6 +29,7 @@ class HomeWidget extends StatefulWidget {
 class _HomeWidgetState extends State<HomeWidget> {
   List<Pet> pets = [];
   bool isLoading = true;
+  String? userId;
 
   @override
   void initState() {
@@ -38,10 +39,15 @@ class _HomeWidgetState extends State<HomeWidget> {
 
   Future<void> _fetchPets() async {
     try {
+      userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId == null) throw Exception('No user logged in');
+
       QuerySnapshot snapshot = await FirebaseFirestore.instance
           .collection('pets')
-          .limit(10) // Esetleg limitálva van, ha túl sok adat van
+          .where('userId', isEqualTo: userId)
+          .limit(10) 
           .get();
+      
       List<Pet> fetchedPets = snapshot.docs.map((doc) => Pet.fromFirestore(doc)).toList();
       setState(() {
         pets = fetchedPets;
@@ -72,7 +78,6 @@ class _HomeWidgetState extends State<HomeWidget> {
               ],
             ),
           ),
-          //bottomNavigationBar: const BottomNavigationBar(), // BottomNavigationBar megjelenik a HomeWidget-en belül
         );
       },
     );
@@ -154,7 +159,12 @@ class _HomeWidgetState extends State<HomeWidget> {
           size: 20,
         ),
         onTap: () {
-          // Navigate to pet details
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PetScreenWidget(),
+            ),
+          );
         },
       ),
     );

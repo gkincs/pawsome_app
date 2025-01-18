@@ -8,7 +8,7 @@ import 'package:pawsome_app/bloc/bottom_navigation_bloc.dart';
 import 'package:pawsome_app/screens/home_screen.dart';
 
 class PetProfileWidget extends StatefulWidget {
-  const PetProfileWidget({super.key});
+  const PetProfileWidget({super.key, required petId});
 
   @override
   _PetProfileWidgetState createState() => _PetProfileWidgetState();

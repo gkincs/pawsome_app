@@ -1,24 +1,39 @@
 import 'package:flutter/material.dart';
-
-class Pet {
-  final String name;
-  final String breed;
-
-  Pet({required this.name, required this.breed});
-}
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:pawsome_app/screens/home_screen.dart';
+import 'package:pawsome_app/screens/pet_prof_screen.dart';
 
 class PetScreenWidget extends StatefulWidget {
-  const PetScreenWidget ({super.key});
+  const PetScreenWidget({Key? key}) : super(key: key);
 
   @override
   _PetScreenWidgetState createState() => _PetScreenWidgetState();
 }
 
 class _PetScreenWidgetState extends State<PetScreenWidget> {
-  final List<Pet> pets = [
-    Pet(name: 'Rocky', breed: 'Labrador Retriever'),
-    Pet(name: 'Bella', breed: 'Bengal cat'),
-  ];
+  final CollectionReference petsCollection = FirebaseFirestore.instance.collection('Pets');
+  List<Map<String, dynamic>> pets = [];
+  late String userId;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchPets();
+  }
+
+  Future<void> _fetchPets() async {
+    try {
+      userId = FirebaseAuth.instance.currentUser!.uid;
+      var querySnapshot = await petsCollection.where('userId', isEqualTo: userId).get();
+
+      setState(() {
+        pets = querySnapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+      });
+    } catch (e) {
+      print("Error fetching pets: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +45,7 @@ class _PetScreenWidgetState extends State<PetScreenWidget> {
             _buildHeader(),
             const Divider(color: Color(0xFFCAC4D0)),
             Expanded(
-              child: _buildPetsList(),
+              child: pets.isNotEmpty ? _buildPetsList() : _buildEmptyState(),
             ),
             _buildAddPetButton(),
           ],
@@ -46,7 +61,7 @@ class _PetScreenWidgetState extends State<PetScreenWidget> {
         children: [
           IconButton(
             icon: const Icon(Icons.arrow_back),
-            onPressed: () {},
+            onPressed: () => Navigator.pop(context),
             color: const Color(0xFF65558F),
           ),
           const Text(
@@ -72,7 +87,7 @@ class _PetScreenWidgetState extends State<PetScreenWidget> {
     );
   }
 
-  Widget _buildPetCard(Pet pet) {
+  Widget _buildPetCard(Map<String, dynamic> pet) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       elevation: 0,
@@ -88,7 +103,7 @@ class _PetScreenWidgetState extends State<PetScreenWidget> {
         leading: CircleAvatar(
           backgroundColor: const Color(0xFF65558F),
           child: Text(
-            pet.name[0],
+            pet['name'][0],
             style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -96,7 +111,7 @@ class _PetScreenWidgetState extends State<PetScreenWidget> {
           ),
         ),
         title: Text(
-          pet.name,
+          pet['name'],
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,
@@ -104,16 +119,26 @@ class _PetScreenWidgetState extends State<PetScreenWidget> {
           ),
         ),
         subtitle: Text(
-          pet.breed,
+          pet['breed'],
           style: const TextStyle(
             fontSize: 14,
             color: Colors.grey,
           ),
         ),
-        trailing: const Icon(
-          Icons.arrow_forward_ios,
-          color: Color(0xFF65558F),
-          size: 20,
+        trailing: IconButton(
+          icon: const Icon(
+            Icons.arrow_forward_ios,
+            color: Color(0xFF65558F),
+            size: 20,
+          ),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PetProfileWidget(petId: pet['petId']),
+              ),
+            );
+          },
         ),
       ),
     );
@@ -123,7 +148,14 @@ class _PetScreenWidgetState extends State<PetScreenWidget> {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PetProfileWidget(petId: null),
+            ),
+          );
+        },
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
@@ -152,25 +184,26 @@ class _PetScreenWidgetState extends State<PetScreenWidget> {
     );
   }
 
-  Widget _buildNavItem(String label, bool isSelected) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? const Color(0xFF65558F) : Colors.grey,
-            fontSize: 14,
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.pets,
+            color: Color(0xFFCAC4D0),
+            size: 100,
           ),
-        ),
-        if (isSelected)
-          Container(
-            width: 32,
-            height: 2,
-            margin: const EdgeInsets.only(top: 4),
-            color: const Color(0xFF65558F),
+          const SizedBox(height: 16),
+          const Text(
+            'No pets added yet!',
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.grey,
+            ),
           ),
-      ],
+        ],
+      ),
     );
   }
 }

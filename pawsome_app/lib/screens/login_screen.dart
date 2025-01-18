@@ -1,8 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pawsome_app/bloc/bottom_navigation_bloc.dart';
-import 'package:pawsome_app/screens/first_step_screen.dart';
+import 'package:pawsome_app/screens/home_screen.dart';
 
 class LoginWidget extends StatefulWidget {
   const LoginWidget({super.key});
@@ -23,47 +24,46 @@ class _LoginWidgetState extends State<LoginWidget> {
     super.dispose();
   }
 
-void _performLogin() async {
-  final email = _emailController.text.trim();
-  final password = _passwordController.text.trim();
+  void _performLogin() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
 
-  if (email.isEmpty || password.isEmpty) {
-    _showMessage('Please fill in both fields.');
-    return;
-  }
+    if (email.isEmpty || password.isEmpty) {
+      _showMessage('Please fill in both fields.');
+      return;
+    }
 
-  try {
-    final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-    
-    if (!mounted) return;  // Add mounted check here
-    
-    if (credential.user != null) {
-      _showMessage('Login successful!', success: true);
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const FirststepWidget(),
-        ),
+    try {
+      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
       );
+
+      if (!mounted) return;
+
+      if (credential.user != null) {
+        _showMessage('Login successful!', success: true);
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeWidget()),
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+
+      if (e.code == 'user-not-found') {
+        _showMessage('No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        _showMessage('Wrong password provided.');
+      } else {
+        _showMessage('Login failed. Please try again.');
+      }
+    } catch (e) {
+      if (!mounted) return;
+      _showMessage('An error occurred. Please try again later.');
     }
-  } on FirebaseAuthException catch (e) {
-    if (!mounted) return;  // Add mounted check here
-    
-    if (e.code == 'user-not-found') {
-      _showMessage('No user found for that email.');
-    } else if (e.code == 'wrong-password') {
-      _showMessage('Wrong password provided.');
-    } else {
-      _showMessage('Login failed. Please try again.');
-    }
-  } catch (e) {
-    if (!mounted) return;  // Add mounted check here
-    _showMessage('An error occurred. Please try again later.');
   }
-}
 
   void _showMessage(String message, {bool success = false}) {
     final color = success ? Colors.green : Colors.red;

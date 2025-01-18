@@ -25,7 +25,10 @@ class Pawsome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: ScreenManager(),
+      home: Scaffold(
+        body: ScreenManager(),
+        bottomNavigationBar: BottomNavigationBarWidget(),
+      ),
     );
   }
 }

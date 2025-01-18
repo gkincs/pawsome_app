@@ -1,6 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pawsome_app/bloc/bottom_navigation_bloc.dart';
+import 'package:pawsome_app/screens/login_screen.dart';
+
 
 class SigninWidget extends StatefulWidget {
   const SigninWidget({super.key});
@@ -10,6 +13,8 @@ class SigninWidget extends StatefulWidget {
 }
 
 class _SigninWidgetState extends State<SigninWidget> {
+  bool _isSigningIn = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,8 +36,13 @@ class _SigninWidgetState extends State<SigninWidget> {
                       children: [
                         _buildLogo(),
                         const SizedBox(height: 100),
-                        _buildSignInButton(context),
+                        BlocBuilder<BottomNavigationBloc, BottomNavigationState>(
+                          builder: (context, state) {
+                            return _buildSignInButton(context);
+                          },
+                        ),
                         const SizedBox(height: 16),
+                        if (_isSigningIn) const Center(child: CircularProgressIndicator()),
                       ],
                     ),
                   ),
@@ -59,9 +69,30 @@ class _SigninWidgetState extends State<SigninWidget> {
 
   Widget _buildSignInButton(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {
-        // Tartalom frissítése (LoginWidget megjelenítése)
-        context.read<BottomNavigationBloc>().add(UpdateContent(1)); // Frissítjük a tartalom indexét (LoginWidget)
+      onPressed: () async {
+        setState(() {
+          _isSigningIn = true; // Indikátor megjelenítése
+        });
+
+        try {
+          UserCredential userCredential = await FirebaseAuth.instance.signInAnonymously();
+
+          if (userCredential.user != null) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const LoginWidget()),
+            );
+          }
+        } catch (e) {
+          print('Sign-in failed: ${e.toString()}'); // Nyomtatjuk a hibát
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Sign-in failed: ${e.toString()}')),
+          );
+        } finally {
+          setState(() {
+            _isSigningIn = false; // Visszaállítjuk a státuszt
+          });
+        }
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFFEADDFF),
