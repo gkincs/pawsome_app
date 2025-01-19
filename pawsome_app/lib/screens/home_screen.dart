@@ -8,15 +8,20 @@ import 'package:pawsome_app/screens/pet_screen.dart';
 import 'package:pawsome_app/widgets/bottom_navigation_widget.dart';
 
 class Pet {
+  final String id;
   final String name;
   final String breed;
+  final String? profileImageUrl;
 
-  Pet({required this.name, required this.breed});
+  Pet({required this.id, required this.name, required this.breed, this.profileImageUrl});
 
   factory Pet.fromFirestore(DocumentSnapshot doc) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
     return Pet(
-      name: doc['name'] ?? '',
-      breed: doc['breed'] ?? '',
+      id: doc.id,
+      name: data['name'] ?? '',
+      breed: data['breed'] ?? '',
+      profileImageUrl: data['profileImageUrl'],
     );
   }
 }
@@ -101,17 +106,6 @@ class _HomeWidgetState extends State<HomeWidget> {
     }
   }
 
-  Future<void> _logout() async {
-    try {
-      await FirebaseAuth.instance.signOut();
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const LoginWidget()),
-      );
-    } catch (e) {
-      print('Error during logout: $e');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<BottomNavigationBloc, BottomNavigationState>(
@@ -183,18 +177,17 @@ class _HomeWidgetState extends State<HomeWidget> {
     );
   }
 
-  Widget _buildPetsSection() {
-    return Expanded(
-      child: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: pets.length,
-        itemBuilder: (context, index) {
-          return _buildPetCard(pets[index]);
-        },
-      ),
-    );
-  }
-
+Widget _buildPetsSection() {
+  return Expanded(
+    child: ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: pets.length,
+      itemBuilder: (context, index) {
+        return _buildPetCard(pets[index]);
+      },
+    ),
+  );
+}
 
   Widget _buildPetCard(Pet pet) {
     return Card(
@@ -208,6 +201,7 @@ class _HomeWidgetState extends State<HomeWidget> {
         ),
       ),
       child: ListTile(
+        leading: _buildPetAvatar(pet),
         title: Text(
           pet.name,
           style: const TextStyle(
@@ -232,11 +226,32 @@ class _HomeWidgetState extends State<HomeWidget> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => PetScreenWidget(),
+              builder: (context) => PetScreenWidget(petId: pet.id),
             ),
           );
         },
       ),
     );
+  }
+
+  Widget _buildPetAvatar(Pet pet) {
+    if (pet.profileImageUrl != null && pet.profileImageUrl!.isNotEmpty) {
+      return CircleAvatar(
+        backgroundImage: NetworkImage(pet.profileImageUrl!),
+        radius: 20,
+      );
+    } else {
+      return CircleAvatar(
+        backgroundColor: const Color(0xFFEADDFF),
+        radius: 20,
+        child: Text(
+          pet.name[0].toUpperCase(),
+          style: const TextStyle(
+            color: Color(0xFF65558F),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      );
+    }
   }
 }
