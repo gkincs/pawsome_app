@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pawsome_app/bloc/bottom_navigation_bloc.dart';
 import 'package:pawsome_app/screens/login_screen.dart';
 import 'package:pawsome_app/screens/pet_screen.dart';
+import 'package:pawsome_app/widgets/bottom_navigation_widget.dart';
 
 class Pet {
   final String name;
@@ -29,29 +30,67 @@ class HomeWidget extends StatefulWidget {
 
 class _HomeWidgetState extends State<HomeWidget> {
   List<Pet> pets = [];
-  bool isLoading = true;
+  bool isLoading = false;
   String? userId;
+  DocumentSnapshot? lastDocument;
+  bool hasMorePets = true;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_scrollListener);
     _fetchPets();
   }
 
+  @override
+  void dispose() {
+    _scrollController.removeListener(_scrollListener);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollListener() {
+    if (_scrollController.offset >= _scrollController.position.maxScrollExtent &&
+        !_scrollController.position.outOfRange) {
+      _fetchPets();
+    }
+  }
+
   Future<void> _fetchPets() async {
+    if (isLoading || !hasMorePets) return;
+
+    setState(() {
+      isLoading = true;
+    });
+
     try {
       userId = FirebaseAuth.instance.currentUser?.uid;
       if (userId == null) throw Exception('No user logged in');
 
-      QuerySnapshot snapshot = await FirebaseFirestore.instance
+      Query query = FirebaseFirestore.instance
           .collection('pets')
           .where('userId', isEqualTo: userId)
-          .limit(10) 
-          .get();
+          .limit(4);
+
+      if (lastDocument != null) {
+        query = query.startAfterDocument(lastDocument!);
+      }
+
+      QuerySnapshot snapshot = await query.get();
       
+      if (snapshot.docs.isEmpty) {
+        setState(() {
+          hasMorePets = false;
+          isLoading = false;
+        });
+        return;
+      }
+
       List<Pet> fetchedPets = snapshot.docs.map((doc) => Pet.fromFirestore(doc)).toList();
       setState(() {
-        pets = fetchedPets;
+        pets.addAll(fetchedPets);
+        lastDocument = snapshot.docs.last;
         isLoading = false;
       });
     } catch (error) {
@@ -84,66 +123,65 @@ class _HomeWidgetState extends State<HomeWidget> {
               children: [
                 _buildHeader(),
                 const Divider(color: Color(0xFFCAC4D0)),
-                isLoading
-                    ? const Expanded(child: Center(child: CircularProgressIndicator()))
-                    : _buildPetsSection(),
+                _buildPetsSection(),
               ],
             ),
           ),
+          bottomNavigationBar: const BottomNavigationBarWidget(),
         );
       },
     );
   }
 
- Widget _buildHeader() {
-  return Container(
-    padding: const EdgeInsets.all(16),
-    child: Row(
-      children: [
-        IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {},
-          color: const Color(0xFF65558F),
-        ),
-        const Expanded(
-          child: Text(
-            'PawSome',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w500,
-              color: Colors.black,
+  Widget _buildHeader() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {},
+            color: const Color(0xFF65558F),
+          ),
+          const Expanded(
+            child: Text(
+              'PawSome',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w500,
+                color: Colors.black,
+              ),
             ),
           ),
-        ),
-        PopupMenuButton<String>(
-          icon: const Icon(Icons.settings, color: Colors.black),
-          onSelected: (value) async {
-            if (value == 'logout') {
-              try {
-                await FirebaseAuth.instance.signOut();
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => const LoginWidget()),
-                );
-              } catch (e) {
-                print('Error during logout: $e');
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Logout failed: $e')),
-                );
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.settings, color: Colors.black),
+            onSelected: (value) async {
+              if (value == 'logout') {
+                try {
+                  await FirebaseAuth.instance.signOut();
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => const LoginWidget()),
+                  );
+                } catch (e) {
+                  print('Error during logout: $e');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Logout failed: $e')),
+                  );
+                }
               }
-            }
-          },
-          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-            const PopupMenuItem<String>(
-              value: 'logout',
-              child: Text('Logout'),
-            ),
-          ],
-        ),
-      ],
-    ),
-  );
-}
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'logout',
+                child: Text('Logout'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildPetsSection() {
     return Expanded(
@@ -156,6 +194,7 @@ class _HomeWidgetState extends State<HomeWidget> {
       ),
     );
   }
+
 
   Widget _buildPetCard(Pet pet) {
     return Card(
