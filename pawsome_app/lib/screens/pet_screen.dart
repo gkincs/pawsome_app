@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:pawsome_app/screens/home_screen.dart';
 import 'package:pawsome_app/screens/pet_prof_screen.dart';
+import 'package:pawsome_app/widgets/bottom_navigation_widget.dart';
 
 class PetScreenWidget extends StatefulWidget {
-  const PetScreenWidget({Key? key}) : super(key: key);
+  const PetScreenWidget({super.key});
 
   @override
   _PetScreenWidgetState createState() => _PetScreenWidgetState();
 }
 
 class _PetScreenWidgetState extends State<PetScreenWidget> {
-  final CollectionReference petsCollection = FirebaseFirestore.instance.collection('Pets');
+  final CollectionReference petsCollection = FirebaseFirestore.instance.collection('pets');
   List<Map<String, dynamic>> pets = [];
   late String userId;
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -28,10 +29,18 @@ class _PetScreenWidgetState extends State<PetScreenWidget> {
       var querySnapshot = await petsCollection.where('userId', isEqualTo: userId).get();
 
       setState(() {
-        pets = querySnapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+        pets = querySnapshot.docs.map((doc) {
+          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+          data['petId'] = doc.id;
+          return data;
+        }).toList();
+        isLoading = false;
       });
     } catch (e) {
       print("Error fetching pets: $e");
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -45,38 +54,36 @@ class _PetScreenWidgetState extends State<PetScreenWidget> {
             _buildHeader(),
             const Divider(color: Color(0xFFCAC4D0)),
             Expanded(
-              child: pets.isNotEmpty ? _buildPetsList() : _buildEmptyState(),
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : pets.isNotEmpty
+                      ? _buildPetsList()
+                      : _buildEmptyState(),
             ),
             _buildAddPetButton(),
           ],
         ),
       ),
+      bottomNavigationBar: const BottomNavigationBarWidget(currentIndex: 1),
     );
   }
 
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => Navigator.pop(context),
-            color: const Color(0xFF65558F),
-          ),
-          const Text(
-            'PawSome',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w500,
-              color: Color(0xFF65558F),
-            ),
-          ),
-        ],
+      child: const Text(
+        'Pets',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontFamily: 'Roboto',
+          fontSize: 22,
+          fontWeight: FontWeight.w500,
+          color: Colors.black,
+        ),
       ),
     );
   }
-
+  
   Widget _buildPetsList() {
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -125,84 +132,63 @@ class _PetScreenWidgetState extends State<PetScreenWidget> {
             color: Colors.grey,
           ),
         ),
-        trailing: IconButton(
-          icon: const Icon(
-            Icons.arrow_forward_ios,
-            color: Color(0xFF65558F),
-            size: 20,
-          ),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => PetProfileWidget(petId: pet['petId']),
-              ),
-            );
-          },
+        trailing: const Icon(
+          Icons.arrow_forward_ios,
+          color: Color(0xFF65558F),
+          size: 20,
         ),
-      ),
-    );
-  }
-
-  Widget _buildAddPetButton() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: InkWell(
         onTap: () {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => PetProfileWidget(petId: null),
+              builder: (context) => PetProfileWidget(petId: pet['petId']),
             ),
           );
         },
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFFEADDFF)),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.add_circle_outline,
-                color: Color(0xFF65558F),
-              ),
-              SizedBox(width: 8),
-              Text(
-                'Add a new pet',
-                style: TextStyle(
-                  color: Color(0xFF65558F),
-                  fontSize: 16,
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
 
+Widget _buildAddPetButton() {
+  return Padding(
+    padding: const EdgeInsets.all(16),
+    child: ElevatedButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const PetProfileWidget(petId: null),
+          ),
+        );
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFFEADDFF),
+        foregroundColor: const Color(0xFF65558F),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(100),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 15),
+        minimumSize: const Size(120, 50),
+      ),
+      child: const Text(
+        'Add',
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    ),
+  );
+}
+
   Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.pets,
-            color: Color(0xFFCAC4D0),
-            size: 100,
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'No pets added yet!',
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.grey,
-            ),
-          ),
-        ],
+    return const Center(
+      child: Text(
+        'No pets added yet!',
+        style: TextStyle(
+          fontSize: 18,
+          color: Colors.grey,
+        ),
       ),
     );
   }

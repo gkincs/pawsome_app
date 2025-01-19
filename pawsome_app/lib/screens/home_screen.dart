@@ -121,7 +121,7 @@ class _HomeWidgetState extends State<HomeWidget> {
               ],
             ),
           ),
-          bottomNavigationBar: const BottomNavigationBarWidget(),
+          bottomNavigationBar: const BottomNavigationBarWidget(currentIndex: 0,),
         );
       },
     );
@@ -226,7 +226,7 @@ Widget _buildPetsSection() {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => PetScreenWidget(petId: pet.id),
+              builder: (context) => PetScreenWidget(),
             ),
           );
         },

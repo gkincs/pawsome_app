@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:pawsome_app/widgets/bottom_navigation_widget.dart';
+import 'package:pawsome_app/screens/nutrition_diary.dart';
+import 'package:pawsome_app/screens/activity_screen.dart';
+import 'package:pawsome_app/screens/appointment_screen.dart';
+import 'package:pawsome_app/screens/health_info_screen.dart';
+import 'package:pawsome_app/screens/expenses_screen.dart';
 
 class DiaryWidget extends StatefulWidget {
   const DiaryWidget({super.key});
@@ -8,8 +14,6 @@ class DiaryWidget extends StatefulWidget {
 }
 
 class _DiaryWidgetState extends State<DiaryWidget> {
-  int _selectedIndex = 2; // Default to Diary
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,31 +23,31 @@ class _DiaryWidgetState extends State<DiaryWidget> {
             _buildHeader(),
             const Divider(color: Color(0xFFCAC4D0)),
             Expanded(child: _buildDiaryItems()),
-            _buildBottomNavBar(),
           ],
         ),
       ),
+      bottomNavigationBar: const BottomNavigationBarWidget(currentIndex: 2),
     );
   }
 
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.all(16),
-      color: const Color(0xFFEDF2FB).withOpacity(0.25),
+      color: const Color(0xFFEADDFF).withOpacity(0.25),
       child: Row(
         children: [
-          _buildIconButton(Icons.menu),
-          const SizedBox(width: 16),
-          const Text(
-            'Diary',
-            style: TextStyle(
-              color: Color(0xFF1D1B20),
-              fontFamily: 'Roboto',
-              fontSize: 22,
-              fontWeight: FontWeight.normal,
+          const Expanded(
+            child: Text(
+              'Diary',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.black,
+                fontFamily: 'Roboto',
+                fontSize: 22,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
-          const Spacer(),
           _buildIconButton(Icons.search),
         ],
       ),
@@ -57,17 +61,17 @@ class _DiaryWidgetState extends State<DiaryWidget> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(100),
       ),
-      child: Icon(icon, color: Colors.black),
+      child: Icon(icon, color: const Color(0xFF65558F)),
     );
   }
 
   Widget _buildDiaryItems() {
     final items = [
-      ('Nutrition Diary', const Color(0xFFEDF2FB)),
-      ('Activity Screen', const Color(0xFFE2EAFC)),
-      ('Appointments', const Color(0xFFE2EAFC)),
-      ('Health Info', const Color(0xFFD7E3FC)),
-      ('Expenses', const Color(0xFFCCDBFD)),
+      ('Nutrition Diary', const Color.fromARGB(255, 220, 205, 243), NutritionDiaryWidget()),
+      ('Activity Screen', const Color(0xFFD0BCFF), ActivityScreenWidget()),
+      ('Appointments', const Color(0xFFD0BCFF), AppointmentWidget()),
+      ('Health Info', const Color(0xFFB69DF8), HealthInfoWidget()),
+      ('Expenses', const Color(0xFF9A82DB), ExpensesWidget()),
     ];
 
     return ListView.separated(
@@ -75,82 +79,31 @@ class _DiaryWidgetState extends State<DiaryWidget> {
       itemCount: items.length,
       separatorBuilder: (context, index) => const SizedBox(height: 16),
       itemBuilder: (context, index) {
-        return _buildDiaryItem(items[index].$1, items[index].$2);
-      },
-    );
-  }
-
-  Widget _buildDiaryItem(String title, Color color) {
-    return ElevatedButton(
-      onPressed: () {
-        // Add your button action here
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color,
-        foregroundColor: const Color(0xFF65558F),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(100),
-          side: const BorderSide(color: Colors.black),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      ),
-      child: Text(
-        title,
-        textAlign: TextAlign.center,
-        style: const TextStyle(
-          fontFamily: 'Roboto',
-          fontSize: 14,
-          fontWeight: FontWeight.normal,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottomNavBar() {
-    return Container(
-      color: const Color(0xFFF0F3FA),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildNavItem('Home', 0),
-          _buildNavItem('Pets', 1),
-          _buildNavItem('Diary', 2),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNavItem(String title, int index) {
-    final isSelected = _selectedIndex == index;
-    return GestureDetector(
-      onTap: () => setState(() => _selectedIndex = index),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              title,
-              style: TextStyle(
-                color: isSelected ? const Color(0xFF65558F) : const Color(0xFF49454F),
-                fontFamily: 'Roboto',
-                fontSize: 14,
-                fontWeight: FontWeight.normal,
-              ),
+        final (title, color, widget) = items[index];
+        return ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => widget),
+            );
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: color,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(100),
             ),
-            if (isSelected)
-              Container(
-                width: 29,
-                height: 3,
-                margin: const EdgeInsets.only(top: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF65558F),
-                  borderRadius: BorderRadius.circular(100),
-                ),
-              ),
-          ],
-        ),
-      ),
+            padding: const EdgeInsets.symmetric(vertical: 16),
+          ),
+          child: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        );
+      },
     );
   }
 }

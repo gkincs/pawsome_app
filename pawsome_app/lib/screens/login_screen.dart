@@ -1,10 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pawsome_app/bloc/bottom_navigation_bloc.dart';
 import 'package:pawsome_app/screens/first_step_screen.dart';
 import 'package:pawsome_app/screens/home_screen.dart';
+import 'package:pawsome_app/screens/new_account_screen.dart';
 
 class LoginWidget extends StatefulWidget {
   const LoginWidget({super.key});
@@ -27,6 +26,8 @@ class _LoginWidgetState extends State<LoginWidget> {
   }
 
   Future<void> _performLogin() async {
+    if (_isLoading) return;
+
     setState(() {
       _isLoading = true;
     });
@@ -55,15 +56,9 @@ class _LoginWidgetState extends State<LoginWidget> {
 
         bool isFirstLogin = await _isFirstLogin(credential.user!.uid);
         if (isFirstLogin) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const FirststepWidget()),
-          );
+          _navigateToFirstStep();
         } else {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const HomeWidget()),
-          );
+          _navigateToHome();
         }
       }
     } on FirebaseAuthException catch (e) {
@@ -109,6 +104,24 @@ class _LoginWidgetState extends State<LoginWidget> {
         content: Text(message),
         backgroundColor: color,
       ),
+    );
+  }
+
+  void _navigateToFirstStep() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => const FirststepWidget()),
+    );
+  }
+
+  void _navigateToHome() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => const HomeWidget()),
+    );
+  }
+
+  void _navigateToSignUp() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const NewAccountWidget()),
     );
   }
 
@@ -219,7 +232,7 @@ class _LoginWidgetState extends State<LoginWidget> {
     return ElevatedButton(
       onPressed: _isLoading ? null : _performLogin,
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFFEADDFF),
+        backgroundColor: const Color(0xFF65558F),
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(vertical: 15),
         shape: RoundedRectangleBorder(
@@ -238,9 +251,7 @@ class _LoginWidgetState extends State<LoginWidget> {
       children: [
         const Text("Don't have an account?"),
         TextButton(
-          onPressed: () {
-            context.read<BottomNavigationBloc>().add(UpdateContent(2));
-          },
+          onPressed: _navigateToSignUp,
           child: const Text(
             'Sign up',
             style: TextStyle(

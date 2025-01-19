@@ -2,13 +2,13 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:pawsome_app/bloc/bottom_navigation_bloc.dart';
-import 'package:pawsome_app/screens/home_screen.dart';
+import 'package:pawsome_app/widgets/bottom_navigation_widget.dart';
 
 class PetProfileWidget extends StatefulWidget {
-  const PetProfileWidget({super.key, required petId});
+  final String? petId;
+
+  const PetProfileWidget({Key? key, required this.petId}) : super(key: key);
 
   @override
   _PetProfileWidgetState createState() => _PetProfileWidgetState();
@@ -23,20 +23,56 @@ class _PetProfileWidgetState extends State<PetProfileWidget> {
   XFile? _image;
   final ImagePicker _picker = ImagePicker();
   String? _userId;
+  bool _isEditing = false;
 
-  final List<String> _species = ['Dog', 'Cat', 'Bird', 'Fish', 'Other'];
-  final Map<String, List<String>> _breeds = {
-    'Dog': ['Labrador', 'German Shepherd', 'Bulldog', 'Poodle'],
-    'Cat': ['Persian', 'Siamese', 'Maine Coon', 'British Shorthair'],
-    'Bird': ['Parrot', 'Canary', 'Finch', 'Cockatiel'],
-    'Fish': ['Goldfish', 'Betta', 'Guppy', 'Angelfish'],
-    'Other': ['Hamster', 'Rabbit', 'Guinea Pig', 'Ferret'],
-  };
+final List<String> _species = ['Dog', 'Cat', 'Bird', 'Fish', 'Reptile', 'Small Mammal', 'Horse', 'Farm Animal', 'Exotic'];
+
+final Map<String, List<String>> _breeds = {
+  'Dog': [
+    'Labrador Retriever', 'German Shepherd', 'Golden Retriever', 'French Bulldog', 'Bulldog',
+    'Poodle', 'Beagle', 'Rottweiler', 'Dachshund', 'Yorkshire Terrier', 'Boxer', 'Siberian Husky',
+    'Great Dane', 'Doberman Pinscher', 'Shih Tzu', 'Chihuahua', 'Pug', 'Border Collie'
+  ],
+  'Cat': [
+    'Persian', 'Maine Coon', 'British Shorthair', 'Siamese', 'Ragdoll', 'Sphynx', 'Bengal',
+    'Scottish Fold', 'Abyssinian', 'Russian Blue', 'Norwegian Forest Cat', 'Burmese',
+    'Siberian', 'Birman', 'American Shorthair', 'Oriental Shorthair', 'Exotic Shorthair'
+  ],
+  'Bird': [
+    'Parrot', 'Canary', 'Finch', 'Cockatiel', 'Budgerigar', 'Lovebird', 'Cockatoo',
+    'African Grey', 'Macaw', 'Conure', 'Dove', 'Pigeon', 'Quaker Parrot', 'Eclectus'
+  ],
+  'Fish': [
+    'Goldfish', 'Betta', 'Guppy', 'Angelfish', 'Neon Tetra', 'Molly', 'Platy', 'Discus',
+    'Clownfish', 'Oscar', 'Zebrafish', 'Swordtail', 'Corydoras', 'Rainbowfish'
+  ],
+  'Reptile': [
+    'Bearded Dragon', 'Leopard Gecko', 'Ball Python', 'Corn Snake', 'Chameleon',
+    'Green Iguana', 'Red-Eared Slider', 'Blue-Tongued Skink', 'Crested Gecko'
+  ],
+  'Small Mammal': [
+    'Hamster', 'Rabbit', 'Guinea Pig', 'Ferret', 'Gerbil', 'Rat', 'Mouse', 'Chinchilla',
+    'Hedgehog', 'Sugar Glider', 'Degu', 'Dwarf Hamster'
+  ],
+  'Horse': [
+    'Arabian', 'Quarter Horse', 'Thoroughbred', 'Appaloosa', 'Morgan', 'Paint',
+    'Friesian', 'Clydesdale', 'Shetland Pony', 'Andalusian'
+  ],
+  'Farm Animal': [
+    'Llama', 'Alpaca', 'Chicken', 'Cow', 'Pig', 'Sheep', 'Goat', 'Duck', 'Turkey'
+  ],
+  'Exotic': [
+    'Fennec Fox', 'Capybara', 'Axolotl', 'Kinkajou', 'Serval', 'Wallaby'
+  ]
+};
 
   @override
   void initState() {
     super.initState();
     _getUserId();
+    if (widget.petId != null) {
+      _fetchPetData();
+    }
   }
 
   Future<void> _getUserId() async {
@@ -48,7 +84,29 @@ class _PetProfileWidgetState extends State<PetProfileWidget> {
     }
   }
 
+  Future<void> _fetchPetData() async {
+    try {
+      DocumentSnapshot petDoc = await FirebaseFirestore.instance
+          .collection('pets')
+          .doc(widget.petId)
+          .get();
+      if (petDoc.exists) {
+        Map<String, dynamic> data = petDoc.data() as Map<String, dynamic>;
+        setState(() {
+          _nameController.text = data['name'];
+          _selectedSpecies = data['animalType'];
+          _selectedBreed = data['breed'];
+          _selectedDate = DateTime.now().subtract(Duration(days: data['age'] * 365));
+          _isFemale = data['gender'] == 'Female';
+        });
+      }
+    } catch (e) {
+      print("Error fetching pet data: $e");
+    }
+  }
+
   Future<void> _pickImage() async {
+    if (!_isEditing) return;
     final XFile? selectedImage = await _picker.pickImage(source: ImageSource.gallery);
     if (selectedImage != null) {
       setState(() {
@@ -73,33 +131,27 @@ class _PetProfileWidgetState extends State<PetProfileWidget> {
       return;
     }
 
-    // Egy egyedi azonosítót
-    String petId = FirebaseFirestore.instance.collection('pets').doc().id;
-
     final Map<String, dynamic> petData = {
-      'petId': petId,
       'name': name,
       'animalType': _selectedSpecies,
       'breed': _selectedBreed,
       'age': DateTime.now().year - _selectedDate!.year,
       'gender': _isFemale ? 'Female' : 'Male',
-      'userId': _userId,  // Felhasználó ID-ja
+      'userId': _userId,
     };
 
     try {
-      await FirebaseFirestore.instance.collection('pets').doc(petId).set(petData);
+      if (widget.petId != null) {
+        await FirebaseFirestore.instance.collection('pets').doc(widget.petId).update(petData);
+      } else {
+        await FirebaseFirestore.instance.collection('pets').add(petData);
+      }
       
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Pet profile saved successfully!')),
       );
-      // Clear fields after saving
       setState(() {
-        _nameController.clear();
-        _selectedSpecies = null;
-        _selectedBreed = null;
-        _selectedDate = null;
-        _isFemale = true;
-        _image = null;
+        _isEditing = false;
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -111,54 +163,59 @@ class _PetProfileWidgetState extends State<PetProfileWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const Text(
-                'Pet Profile',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              _buildProfilePicture(),
-              const SizedBox(height: 24),
-              _buildTextField(_nameController, 'Name'),
-              const SizedBox(height: 16),
+      appBar: AppBar(
+        title: const Text('Pet Profile'),
+        actions: [
+          IconButton(
+            icon: Icon(_isEditing ? Icons.save : Icons.settings),
+            onPressed: () {
+              if (_isEditing) {
+                _savePetProfile();
+              } else {
+                setState(() {
+                  _isEditing = true;
+                });
+              }
+            },
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildProfilePicture(),
+            const SizedBox(height: 24),
+            _buildTextField(_nameController, 'Name'),
+            const SizedBox(height: 16),
+            _buildDropdown('Species', _species, _selectedSpecies, (value) {
+              setState(() {
+                _selectedSpecies = value;
+                _selectedBreed = null;
+              });
+            }),
+            const SizedBox(height: 16),
               _buildDropdown(
-                'Species',
-                _species,
-                _selectedSpecies,
-                (value) {
-                  setState(() {
-                    _selectedSpecies = value;
-                    _selectedBreed = null; // Reset breed when species changes
-                  });
-                },
-              ),
-              const SizedBox(height: 16),
-              _buildDropdown(
-                'Breed',
-                _selectedSpecies != null ? _breeds[_selectedSpecies]! : [],
-                _selectedBreed,
+                'Breed', 
+                _selectedSpecies != null && _breeds.containsKey(_selectedSpecies) 
+                  ? _breeds[_selectedSpecies]! 
+                  : [], 
+                _selectedBreed, 
                 (value) {
                   setState(() {
                     _selectedBreed = value;
                   });
-                },
+                }
               ),
-              const SizedBox(height: 16),
-              _buildDatePicker(context),
-              const SizedBox(height: 24),
-              _buildGenderSelector(),
-              const SizedBox(height: 24),
-              _buildSaveButton(context),
-            ],
-          ),
+            const SizedBox(height: 16),
+            _buildDatePicker(context),
+            const SizedBox(height: 24),
+            _buildGenderSelector(),
+          ],
         ),
       ),
+      bottomNavigationBar: const BottomNavigationBarWidget(currentIndex: 1),
     );
   }
 
@@ -184,22 +241,23 @@ class _PetProfileWidgetState extends State<PetProfileWidget> {
                   )
                 : const Icon(Icons.person_outline, size: 80, color: Colors.grey),
           ),
-          Positioned(
-            right: 0,
-            bottom: 0,
-            child: GestureDetector(
-              onTap: _pickImage,
-              child: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.grey[300]!),
+          if (_isEditing)
+            Positioned(
+              right: 0,
+              bottom: 0,
+              child: GestureDetector(
+                onTap: _pickImage,
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.grey[300]!),
+                  ),
+                  child: const Icon(Icons.add, size: 18),
                 ),
-                child: const Icon(Icons.add, size: 18),
               ),
             ),
-          ),
         ],
       ),
     );
@@ -213,12 +271,13 @@ class _PetProfileWidgetState extends State<PetProfileWidget> {
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
+      enabled: _isEditing,
     );
   }
 
   Widget _buildDropdown(String label, List<String> items, String? value, Function(String?) onChanged) {
     return DropdownButtonFormField<String>(
-      value: value,
+      value: items.contains(value) ? value : null,
       decoration: InputDecoration(
         labelText: label,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
@@ -230,13 +289,13 @@ class _PetProfileWidgetState extends State<PetProfileWidget> {
           child: Text(item),
         );
       }).toList(),
-      onChanged: onChanged,
+      onChanged: _isEditing ? onChanged : null,
     );
   }
 
   Widget _buildDatePicker(BuildContext context) {
     return GestureDetector(
-      onTap: () async {
+      onTap: _isEditing ? () async {
         final DateTime? picked = await showDatePicker(
           context: context,
           initialDate: _selectedDate ?? DateTime.now(),
@@ -248,7 +307,7 @@ class _PetProfileWidgetState extends State<PetProfileWidget> {
             _selectedDate = picked;
           });
         }
-      },
+      } : null,
       child: AbsorbPointer(
         child: TextField(
           controller: TextEditingController(
@@ -262,6 +321,7 @@ class _PetProfileWidgetState extends State<PetProfileWidget> {
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             suffixIcon: const Icon(Icons.calendar_today, size: 16),
           ),
+          enabled: false,
         ),
       ),
     );
@@ -277,11 +337,11 @@ class _PetProfileWidgetState extends State<PetProfileWidget> {
         children: [
           Expanded(
             child: GestureDetector(
-              onTap: () => setState(() => _isFemale = true),
+              onTap: _isEditing ? () => setState(() => _isFemale = true) : null,
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
-                  color: _isFemale ? Color(0xFF65558F): null,
+                  color: _isFemale ? const Color(0xFF65558F) : null,
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(8),
                     bottomLeft: Radius.circular(8),
@@ -303,11 +363,11 @@ class _PetProfileWidgetState extends State<PetProfileWidget> {
           ),
           Expanded(
             child: GestureDetector(
-              onTap: () => setState(() => _isFemale = false),
+              onTap: _isEditing ? () => setState(() => _isFemale = false) : null,
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
-                  color: !_isFemale ? Color(0xFF65558F) : null,
+                  color: !_isFemale ? const Color(0xFF65558F) : null,
                   borderRadius: const BorderRadius.only(
                     topRight: Radius.circular(8),
                     bottomRight: Radius.circular(8),
@@ -329,30 +389,6 @@ class _PetProfileWidgetState extends State<PetProfileWidget> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildSaveButton(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () async {
-        await _savePetProfile(); // Várjuk meg a mentés befejezését
-        if (!mounted) return; // Ellenőrizzük, hogy a widget még mindig a fában van-e
-
-        context.read<BottomNavigationBloc>().add(UpdateContent(1)); // Frissíti a BLoC állapotát
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomeWidget()),
-        );
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFFEADDFF),
-        foregroundColor: Colors.black,
-        padding: const EdgeInsets.symmetric(vertical: 15),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30),
-        ),
-      ),
-      child: const Text('Save'),
     );
   }
 }

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pawsome_app/bloc/bottom_navigation_bloc.dart';
+import 'package:pawsome_app/screens/login_screen.dart';
 
 class NewAccountWidget extends StatefulWidget {
   const NewAccountWidget({super.key});
@@ -26,47 +25,49 @@ class _NewAccountWidgetState extends State<NewAccountWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child: Center(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 36.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                const Text(
-                  'Create a new account',
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 60),
-                _buildInputField(_fullNameController, 'Full name'),
-                const SizedBox(height: 16),
-                _buildInputField(_emailController, 'Email', keyboardType: TextInputType.emailAddress),
-                const SizedBox(height: 16),
-                _buildInputField(_passwordController, 'Password', isPassword: true),
-                const SizedBox(height: 30),
-                ElevatedButton(
-                  onPressed: _createAccount,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF65558F),
-                    foregroundColor: Colors.white,
-                    minimumSize: const Size(double.infinity, 48),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+    return Scaffold(
+      body: Container(
+        color: Colors.white,
+        child: Center(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 36.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  const Text(
+                    'Create a new account',
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
                     ),
+                    textAlign: TextAlign.center,
                   ),
-                  child: const Text('Create Account'),
-                ),
-                const SizedBox(height: 20),
-                _buildSignInText(),
-              ],
+                  const SizedBox(height: 60),
+                  _buildInputField(_fullNameController, 'Full name'),
+                  const SizedBox(height: 16),
+                  _buildInputField(_emailController, 'Email', keyboardType: TextInputType.emailAddress),
+                  const SizedBox(height: 16),
+                  _buildInputField(_passwordController, 'Password', isPassword: true),
+                  const SizedBox(height: 30),
+                  ElevatedButton(
+                    onPressed: _createAccount,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF65558F),
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 48),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    child: const Text('Create Account'),
+                  ),
+                  const SizedBox(height: 20),
+                  _buildSignInText(),
+                ],
+              ),
             ),
           ),
         ),
@@ -101,7 +102,10 @@ class _NewAccountWidgetState extends State<NewAccountWidget> {
         ),
         TextButton(
           onPressed: () {
-            context.read<BottomNavigationBloc>().add(UpdateContent(1));
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const LoginWidget()),
+            );
           },
           child: const Text(
             'Sign in',
@@ -139,7 +143,10 @@ class _NewAccountWidgetState extends State<NewAccountWidget> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Account created successfully!')),
           );
-          context.read<BottomNavigationBloc>().add(UpdateContent(1));
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginWidget()),
+          );
         }
       } catch (e) {
         if (mounted) {
