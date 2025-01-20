@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ActivityScreenWidget extends StatefulWidget {
-  const ActivityScreenWidget({super.key});
+  final String? petId;
+
+  const ActivityScreenWidget({super.key, required this.petId});
 
   @override
   _ActivityScreenWidgetState createState() => _ActivityScreenWidgetState();
@@ -14,32 +17,24 @@ class _ActivityScreenWidgetState extends State<ActivityScreenWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: IntrinsicHeight(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        _buildHeader(),
-                        const Divider(),
-                        _buildActivityTypeSection(),
-                        const Divider(),
-                        _buildDurationSection(),
-                        const Spacer(),
-                        _buildSaveButton(),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildHeader(),
+                const Divider(color: Color(0xFFCAC4D0)),
+                _buildActivityTypeSection(),
+                const Divider(color: Color(0xFFCAC4D0)),
+                _buildDurationSection(),
+                const SizedBox(height: 24),
+                _buildSaveButton(),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -48,16 +43,15 @@ class _ActivityScreenWidgetState extends State<ActivityScreenWidget> {
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16),
-      child: const Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.pets),
-          SizedBox(width: 8),
-          Text(
-            'Activity Information',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-        ],
+      child: const Text(
+        'Activity Information',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontFamily: 'Roboto',
+          fontSize: 22,
+          fontWeight: FontWeight.w500,
+          color: Colors.black,
+        ),
       ),
     );
   }
@@ -69,7 +63,11 @@ class _ActivityScreenWidgetState extends State<ActivityScreenWidget> {
           padding: EdgeInsets.symmetric(vertical: 16),
           child: Text(
             'Activity Type',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF65558F),
+            ),
             textAlign: TextAlign.center,
           ),
         ),
@@ -81,6 +79,7 @@ class _ActivityScreenWidgetState extends State<ActivityScreenWidget> {
             return ChoiceChip(
               label: Text(type),
               selected: selectedActivityType == type,
+              selectedColor: const Color(0xFFEADDFF),
               onSelected: (selected) {
                 setState(() {
                   selectedActivityType = selected ? type : null;
@@ -100,7 +99,11 @@ class _ActivityScreenWidgetState extends State<ActivityScreenWidget> {
           padding: EdgeInsets.symmetric(vertical: 16),
           child: Text(
             'Duration',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF65558F),
+            ),
             textAlign: TextAlign.center,
           ),
         ),
@@ -112,6 +115,7 @@ class _ActivityScreenWidgetState extends State<ActivityScreenWidget> {
             return ChoiceChip(
               label: Text(duration),
               selected: selectedDuration == duration,
+              selectedColor: const Color(0xFFEADDFF),
               onSelected: (selected) {
                 setState(() {
                   selectedDuration = selected ? duration : null;
@@ -125,18 +129,65 @@ class _ActivityScreenWidgetState extends State<ActivityScreenWidget> {
   }
 
   Widget _buildSaveButton() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      child: ElevatedButton(
-        onPressed: () {
-          // Implement save functionality
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF4E82FF),
-          minimumSize: const Size(double.infinity, 50),
+    return ElevatedButton(
+      onPressed: _saveActivityInfo,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFFEADDFF),
+        foregroundColor: const Color(0xFF65558F),
+        minimumSize: const Size(double.infinity, 50),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
         ),
-        child: const Text('Save', style: TextStyle(color: Colors.white)),
       ),
+      child: const Text('Save', style: TextStyle(fontSize: 16)),
     );
+  }
+
+  void _saveActivityInfo() async {
+    if (widget.petId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error: No pet selected')),
+      );
+      return;
+    }
+
+    if (selectedActivityType == null || selectedDuration == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select both activity type and duration')),
+      );
+      return;
+    }
+
+    try {
+      await FirebaseFirestore.instance.collection('activityLogs').add({
+        'activityType': selectedActivityType!.toLowerCase(),
+        'date': FieldValue.serverTimestamp(),
+        'duration': _parseDuration(selectedDuration!),
+        'petId': FirebaseFirestore.instance.doc('pets/${widget.petId}'),
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Activity information saved successfully')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error saving activity information: $e')),
+      );
+    }
+  }
+
+  int _parseDuration(String duration) {
+    switch (duration) {
+      case '< 30 min':
+        return 15;
+      case '30 min':
+        return 30;
+      case '1 hour':
+        return 60;
+      case '1+ hour':
+        return 90;
+      default:
+        return 0;
+    }
   }
 }

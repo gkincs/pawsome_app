@@ -11,7 +11,7 @@ import 'package:pawsome_app/screens/expenses_screen.dart';
 class DiaryWidget extends StatefulWidget {
   final String? petId;
 
-  const DiaryWidget({Key? key, this.petId}) : super(key: key);
+  const DiaryWidget({super.key, this.petId});
 
   @override
   _DiaryWidgetState createState() => _DiaryWidgetState();
@@ -100,10 +100,10 @@ class _DiaryWidgetState extends State<DiaryWidget> {
   Widget _buildDiaryItems() {
     final items = [
       ('Nutrition Diary', const Color.fromARGB(255, 220, 205, 243), (String petId) => NutritionDiaryWidget(petId: petId)),
-      ('Activity Screen', const Color(0xFFD0BCFF), (String petId) => ActivityScreenWidget()),
-      ('Appointments', const Color(0xFFD0BCFF), (String petId) => AppointmentWidget()),
+      ('Activity Screen', const Color(0xFFD0BCFF), (String petId) => ActivityScreenWidget(petId: petId)),
+      ('Appointments', const Color(0xFFD0BCFF), (String petId) => AppointmentWidget(petId: petId,)),
       ('Health Info', const Color(0xFFB69DF8), (String petId) => HealthInfoWidget()),
-      ('Expenses', const Color(0xFF9A82DB), (String petId) => ExpensesWidget()),
+      ('Expenses', const Color(0xFF9A82DB), (String petId) => ExpensesWidget(petId: petId)),
     ];
 
     return ListView.separated(
@@ -149,7 +149,7 @@ class _DiaryWidgetState extends State<DiaryWidget> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Select a pet for $title',
+                  'Select Pet for $title',
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ExpensesWidget extends StatefulWidget {
-  const ExpensesWidget({super.key});
+  final String? petId;
+
+  const ExpensesWidget({Key? key, required this.petId}) : super(key: key);
 
   @override
   _ExpensesWidgetState createState() => _ExpensesWidgetState();
@@ -11,21 +14,19 @@ class ExpensesWidget extends StatefulWidget {
 class _ExpensesWidgetState extends State<ExpensesWidget> {
   String selectedCategory = '';
   final TextEditingController _priceController = TextEditingController();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Expenses'),
-        centerTitle: true,
-      ),
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           children: [
             _buildHeader(),
-            const Divider(),
+            const Divider(color: Color(0xFFCAC4D0)),
             _buildCategoriesSection(),
-            const Divider(),
+            const Divider(color: Color(0xFFCAC4D0)),
             _buildPriceInput(),
             const Spacer(),
             _buildSaveButton()
@@ -38,16 +39,15 @@ class _ExpensesWidgetState extends State<ExpensesWidget> {
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.all(16),
-      child: const Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.pets),
-          SizedBox(width: 8),
-          Text(
-            'Expenses',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-        ],
+      child: const Text(
+        'Expenses',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontFamily: 'Roboto',
+          fontSize: 22,
+          fontWeight: FontWeight.w500,
+          color: Colors.black,
+        ),
       ),
     );
   }
@@ -59,7 +59,11 @@ class _ExpensesWidgetState extends State<ExpensesWidget> {
           padding: EdgeInsets.all(16),
           child: Text(
             'Categories',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF65558F),
+            ),
             textAlign: TextAlign.center,
           ),
         ),
@@ -84,6 +88,7 @@ class _ExpensesWidgetState extends State<ExpensesWidget> {
     return ChoiceChip(
       label: Text(category),
       selected: selectedCategory == category,
+      selectedColor: const Color(0xFFEADDFF),
       onSelected: (selected) {
         setState(() {
           selectedCategory = selected ? category : '';
@@ -114,16 +119,56 @@ class _ExpensesWidgetState extends State<ExpensesWidget> {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: ElevatedButton(
-        onPressed: () {
-          // Implement save functionality
-        },
+        onPressed: _saveExpense,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF4E82FF),
+          backgroundColor: const Color(0xFFEADDFF),
+          foregroundColor: const Color(0xFF65558F),
           minimumSize: const Size(double.infinity, 50),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
         ),
-        child: const Text('Save', style: TextStyle(color: Colors.white)),
+        child: const Text('Save', style: TextStyle(fontSize: 16)),
       ),
     );
   }
 
+  void _saveExpense() async {
+    if (widget.petId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error: No pet selected')),
+      );
+      return;
+    }
+
+    if (selectedCategory.isEmpty || _priceController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill in all fields')),
+      );
+      return;
+    }
+
+    try {
+      await _firestore.collection('expenses').add({
+        'amount': _priceController.text,
+        'date': FieldValue.serverTimestamp(),
+        'description': selectedCategory,
+        'petId': _firestore.doc('pets/${widget.petId}'),
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Expense saved successfully')),
+      );
+
+      // Clear inputs after saving
+      setState(() {
+        selectedCategory = '';
+        _priceController.clear();
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error saving expense: $e')),
+      );
+    }
+  }
 }
