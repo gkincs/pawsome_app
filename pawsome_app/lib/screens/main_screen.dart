@@ -36,9 +36,9 @@ class MainScreen extends StatelessWidget {
       case 0:
         return const HomeWidget();
       case 1:
-        return const PetScreenWidget();
+        return const PetScreenWidget(petId: null);
       case 2:
-        return const DiaryWidget();
+        return const DiaryWidget(petId: null);
       default:
         return const HomeWidget();
     }

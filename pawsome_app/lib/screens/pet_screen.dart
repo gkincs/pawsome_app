@@ -5,7 +5,9 @@ import 'package:pawsome_app/screens/pet_prof_screen.dart';
 import 'package:pawsome_app/widgets/bottom_navigation_widget.dart';
 
 class PetScreenWidget extends StatefulWidget {
-  const PetScreenWidget({super.key});
+  final String? petId;
+
+  const PetScreenWidget({Key? key, this.petId}) : super(key: key);
 
   @override
   _PetScreenWidgetState createState() => _PetScreenWidgetState();

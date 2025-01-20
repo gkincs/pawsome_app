@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class NutritionDiaryWidget extends StatefulWidget {
-  const NutritionDiaryWidget({super.key});
+  final String? petId;
+
+  const NutritionDiaryWidget({Key? key, required this.petId}) : super(key: key);
 
   @override
   _NutritionDiaryWidgetState createState() => _NutritionDiaryWidgetState();
@@ -14,13 +17,14 @@ class _NutritionDiaryWidgetState extends State<NutritionDiaryWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           children: [
             _buildHeader(),
-            const Divider(),
+            const Divider(color: Color(0xFFCAC4D0)),
             _buildFoodTypeSection(),
-            const Divider(),
+            const Divider(color: Color(0xFFCAC4D0)),
             _buildAmountSection(),
             const Spacer(),
             _buildSaveButton()
@@ -33,15 +37,15 @@ class _NutritionDiaryWidgetState extends State<NutritionDiaryWidget> {
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.all(16),
-      child: const Row(
-        children: [
-          Icon(Icons.pets),
-          SizedBox(width: 8),
-          Text(
-            'Feeding Information',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-          ),
-        ],
+      child: const Text(
+        'Feeding Information',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontFamily: 'Roboto',
+          fontSize: 22,
+          fontWeight: FontWeight.w500,
+          color: Colors.black,
+        ),
       ),
     );
   }
@@ -53,7 +57,11 @@ class _NutritionDiaryWidgetState extends State<NutritionDiaryWidget> {
           padding: EdgeInsets.all(16),
           child: Text(
             'Food Type',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF65558F),
+            ),
             textAlign: TextAlign.center,
           ),
         ),
@@ -64,6 +72,7 @@ class _NutritionDiaryWidgetState extends State<NutritionDiaryWidget> {
             return ChoiceChip(
               label: Text(type),
               selected: selectedFoodType == type,
+              selectedColor: const Color(0xFFEADDFF),
               onSelected: (selected) {
                 setState(() {
                   selectedFoodType = type;
@@ -83,7 +92,11 @@ class _NutritionDiaryWidgetState extends State<NutritionDiaryWidget> {
           padding: EdgeInsets.all(16),
           child: Text(
             'Amount',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF65558F),
+            ),
             textAlign: TextAlign.center,
           ),
         ),
@@ -94,6 +107,7 @@ class _NutritionDiaryWidgetState extends State<NutritionDiaryWidget> {
             return ChoiceChip(
               label: Text(amount),
               selected: selectedAmount == amount,
+              selectedColor: const Color(0xFFEADDFF),
               onSelected: (selected) {
                 setState(() {
                   selectedAmount = amount;
@@ -110,16 +124,45 @@ class _NutritionDiaryWidgetState extends State<NutritionDiaryWidget> {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: ElevatedButton(
-        onPressed: () {
-          // Implement save functionality
-        },
+        onPressed: _saveFeedingInfo,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF4E82FF),
+          backgroundColor: const Color(0xFFEADDFF),
+          foregroundColor: const Color(0xFF65558F),
           minimumSize: const Size(double.infinity, 50),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
         ),
-        child: const Text('Save', style: TextStyle(color: Colors.white)),
+        child: const Text('Save', style: TextStyle(fontSize: 16)),
       ),
     );
   }
 
+  void _saveFeedingInfo() async {
+    if (widget.petId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error: No pet selected')),
+      );
+      return;
+    }
+
+    try {
+      await FirebaseFirestore.instance
+          .collection('feedingLogs')
+          .add({
+        'amount': selectedAmount.toLowerCase(),
+        'date': FieldValue.serverTimestamp(),
+        'foodType': selectedFoodType.toLowerCase(),
+        'petId': FirebaseFirestore.instance.doc('pets/${widget.petId}'),
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Feeding information saved successfully')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error saving feeding information: $e')),
+      );
+    }
+  }
 }
