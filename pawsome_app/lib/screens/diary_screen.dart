@@ -103,7 +103,7 @@ class _DiaryWidgetState extends State<DiaryWidget> {
       ('Activity Screen', const Color(0xFFD0BCFF), (String petId) => ActivityHistoryWidget(petId: petId)),
       ('Appointments', const Color(0xFFD0BCFF), (String petId) => AppointmentHistoryWidget()),
       ('Health Info', const Color(0xFFB69DF8), (String petId) => MedicationHistoryWidget()),
-      ('Expenses', const Color(0xFF9A82DB), (String petId) => ExpensesHistoryWidget()),
+      ('Expenses', const Color(0xFF9A82DB), (String petId) => ExpensesHistoryWidget(petId: petId,)),
     ];
 
     return ListView.separated(

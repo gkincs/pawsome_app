@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:pawsome_app/widgets/bottom_navigation_widget.dart';
+import 'package:pawsome_app/screens/expenses_history_screen.dart';
 
 class ExpensesWidget extends StatefulWidget {
   final String? petId;
 
-  const ExpensesWidget({Key? key, required this.petId}) : super(key: key);
+  const ExpensesWidget({super.key, required this.petId});
 
   @override
   _ExpensesWidgetState createState() => _ExpensesWidgetState();
@@ -33,12 +35,13 @@ class _ExpensesWidgetState extends State<ExpensesWidget> {
           ],
         ),
       ),
+      bottomNavigationBar: const BottomNavigationBarWidget(currentIndex: 2),
     );
   }
 
   Widget _buildHeader() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(vertical: 16),
       child: const Text(
         'Expenses',
         textAlign: TextAlign.center,
@@ -105,7 +108,6 @@ class _ExpensesWidgetState extends State<ExpensesWidget> {
         decoration: const InputDecoration(
           labelText: 'Price',
           border: OutlineInputBorder(),
-          prefixText: '€ ',
         ),
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         inputFormatters: [
@@ -160,11 +162,12 @@ class _ExpensesWidgetState extends State<ExpensesWidget> {
         const SnackBar(content: Text('Expense saved successfully')),
       );
 
-      // Clear inputs after saving
-      setState(() {
-        selectedCategory = '';
-        _priceController.clear();
-      });
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ExpensesHistoryWidget(petId: widget.petId!),
+        ),
+      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error saving expense: $e')),
