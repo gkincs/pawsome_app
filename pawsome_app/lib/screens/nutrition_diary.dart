@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:pawsome_app/screens/nutrition_history_screen.dart';
+import 'package:pawsome_app/widgets/bottom_navigation_widget.dart';
 
 class NutritionDiaryWidget extends StatefulWidget {
   final String? petId;
 
-  const NutritionDiaryWidget({Key? key, required this.petId}) : super(key: key);
+  const NutritionDiaryWidget({super.key, required this.petId});
 
   @override
   _NutritionDiaryWidgetState createState() => _NutritionDiaryWidgetState();
@@ -31,6 +33,7 @@ class _NutritionDiaryWidgetState extends State<NutritionDiaryWidget> {
           ],
         ),
       ),
+      bottomNavigationBar: const BottomNavigationBarWidget(currentIndex: 2),
     );
   }
 
@@ -158,6 +161,13 @@ class _NutritionDiaryWidgetState extends State<NutritionDiaryWidget> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Feeding information saved successfully')),
+      );
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => NutritionHistoryWidget(petId: widget.petId!),
+        ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

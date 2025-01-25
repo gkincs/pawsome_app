@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:pawsome_app/widgets/bottom_navigation_widget.dart';
+import 'package:pawsome_app/screens/activity_history_screen.dart';
 
 class ActivityScreenWidget extends StatefulWidget {
   final String? petId;
@@ -37,24 +39,29 @@ class _ActivityScreenWidgetState extends State<ActivityScreenWidget> {
           ),
         ),
       ),
+      bottomNavigationBar: const BottomNavigationBarWidget(currentIndex: 2),
     );
   }
 
-  Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      child: const Text(
-        'Activity Information',
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          fontFamily: 'Roboto',
-          fontSize: 22,
-          fontWeight: FontWeight.w500,
-          color: Colors.black,
+Widget _buildHeader() {
+  return Container(
+    padding: const EdgeInsets.symmetric(vertical: 16),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Text(
+          'Activity Information',
+          style: TextStyle(
+            fontFamily: 'Roboto',
+            fontSize: 22,
+            fontWeight: FontWeight.w500,
+            color: Colors.black,
+          ),
         ),
-      ),
-    );
-  }
+      ],
+    ),
+  );
+}
 
   Widget _buildActivityTypeSection() {
     return Column(
@@ -168,6 +175,14 @@ class _ActivityScreenWidgetState extends State<ActivityScreenWidget> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Activity information saved successfully')),
+      );
+
+      // Navigate back to ActivityHistoryWidget
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ActivityHistoryWidget(petId: widget.petId!),
+        ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

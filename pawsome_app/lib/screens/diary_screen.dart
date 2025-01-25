@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:pawsome_app/screens/activity_history_screen.dart';
 import 'package:pawsome_app/widgets/bottom_navigation_widget.dart';
-import 'package:pawsome_app/screens/nutrition_diary.dart';
-import 'package:pawsome_app/screens/activity_screen.dart';
-import 'package:pawsome_app/screens/appointment_screen.dart';
-import 'package:pawsome_app/screens/health_info_screen.dart';
-import 'package:pawsome_app/screens/expenses_screen.dart';
+import 'package:pawsome_app/screens/nutrition_history_screen.dart';
+import 'package:pawsome_app/screens/appointment_history_screen.dart';
+import 'package:pawsome_app/screens/medication_history_screen.dart';
+import 'package:pawsome_app/screens/expenses_history_screen.dart';
 
 class DiaryWidget extends StatefulWidget {
   final String? petId;
@@ -99,11 +99,11 @@ class _DiaryWidgetState extends State<DiaryWidget> {
 
   Widget _buildDiaryItems() {
     final items = [
-      ('Nutrition Diary', const Color.fromARGB(255, 220, 205, 243), (String petId) => NutritionDiaryWidget(petId: petId)),
-      ('Activity Screen', const Color(0xFFD0BCFF), (String petId) => ActivityScreenWidget(petId: petId)),
-      ('Appointments', const Color(0xFFD0BCFF), (String petId) => AppointmentWidget(petId: petId,)),
-      ('Health Info', const Color(0xFFB69DF8), (String petId) => HealthInfoWidget(petId: petId,)),
-      ('Expenses', const Color(0xFF9A82DB), (String petId) => ExpensesWidget(petId: petId)),
+      ('Nutrition Diary', const Color.fromARGB(255, 220, 205, 243), (String petId) => NutritionHistoryWidget(petId: petId)),
+      ('Activity Screen', const Color(0xFFD0BCFF), (String petId) => ActivityHistoryWidget(petId: petId)),
+      ('Appointments', const Color(0xFFD0BCFF), (String petId) => AppointmentHistoryWidget()),
+      ('Health Info', const Color(0xFFB69DF8), (String petId) => MedicationHistoryWidget()),
+      ('Expenses', const Color(0xFF9A82DB), (String petId) => ExpensesHistoryWidget()),
     ];
 
     return ListView.separated(

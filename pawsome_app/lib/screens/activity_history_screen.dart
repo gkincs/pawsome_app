@@ -1,25 +1,58 @@
 import 'package:flutter/material.dart';
-
-class ActivityItem {
-  final String type;
-  final String duration;
-
-  ActivityItem({required this.type, required this.duration});
-}
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
+import 'package:pawsome_app/screens/activity_screen.dart';
+import 'package:pawsome_app/widgets/bottom_navigation_widget.dart';
 
 class ActivityHistoryWidget extends StatefulWidget {
-  const ActivityHistoryWidget({super.key});
+  final String petId;
+
+  const ActivityHistoryWidget({super.key, required this.petId});
 
   @override
   _ActivityHistoryWidgetState createState() => _ActivityHistoryWidgetState();
 }
 
 class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
-  final List<ActivityItem> activities = [
-    ActivityItem(type: 'Walk', duration: '1 hour'),
-    ActivityItem(type: 'Play', duration: '< 30 min'),
-    ActivityItem(type: 'Walk', duration: '1+ hour'),
-  ];
+  List<Map<String, dynamic>> activities = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchActivities();
+  }
+
+  Future<void> _fetchActivities() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('activityLogs')
+          .where('petId', isEqualTo: FirebaseFirestore.instance.doc('pets/${widget.petId}'))
+          .orderBy('date', descending: true)
+          .get();
+
+      setState(() {
+        activities = querySnapshot.docs.map((doc) {
+          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+          return {
+            'activityType': data['activityType'],
+            'duration': data['duration'],
+            'date': (data['date'] as Timestamp).toDate(),
+          };
+        }).toList();
+        isLoading = false;
+      });
+    } catch (e) {
+      print("Error fetching activities: $e");
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,77 +65,47 @@ class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
             _buildHeader(),
             const Divider(color: Color(0xFFCAC4D0)),
             Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    _buildActivitySection(),
-                    _buildAddButton(),
-                    const SizedBox(height: 16),
-                  ],
-                ),
-              ),
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : activities.isEmpty
+                      ? _buildEmptyState()
+                      : _buildActivitySection(),
             ),
+            _buildAddButton(),
           ],
         ),
       ),
+      bottomNavigationBar: const BottomNavigationBarWidget(currentIndex: 2),
     );
   }
 
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {},
-            color: const Color(0xFF65558F),
-          ),
-          const Expanded(
-            child: Text(
-              'Activity Informations',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w500,
-                color: Color(0xFF65558F),
-              ),
-            ),
-          ),
-          const SizedBox(width: 48),
-        ],
+      child: const Text(
+        'Activity Information',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontFamily: 'Roboto',
+          fontSize: 22,
+          fontWeight: FontWeight.w500,
+          color: Colors.black,
+        ),
       ),
     );
   }
 
   Widget _buildActivitySection() {
-    return Padding(
+    return ListView.builder(
       padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          const Text(
-            'Activity Type',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 16),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: activities.length,
-            itemBuilder: (context, index) {
-              return _buildActivityCard(activities[index]);
-            },
-          ),
-        ],
-      ),
+      itemCount: activities.length,
+      itemBuilder: (context, index) {
+        return _buildActivityCard(activities[index]);
+      },
     );
   }
 
-  Widget _buildActivityCard(ActivityItem activity) {
+  Widget _buildActivityCard(Map<String, dynamic> activity) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       elevation: 0,
@@ -119,7 +122,7 @@ class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              activity.type,
+              activity['activityType'].toString().capitalize(),
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
@@ -128,9 +131,17 @@ class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
             ),
             const SizedBox(height: 4),
             Text(
-              'Duration: ${activity.duration}',
+              'Duration: ${activity['duration']} minutes',
               style: const TextStyle(
                 fontSize: 14,
+                color: Colors.grey,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Date: ${DateFormat('MMM d, y HH:mm').format(activity['date'])}',
+              style: const TextStyle(
+                fontSize: 12,
                 color: Colors.grey,
               ),
             ),
@@ -140,25 +151,46 @@ class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
     );
   }
 
-  Widget _buildAddButton() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Center(
-        child: SizedBox(
-          width: 120,
-          child: ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFEADDFF),
-              foregroundColor: Color(0xFF65558F),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(100),
-              ),
-            ),
-            child: const Text('Add'),
-          ),
+  Widget _buildEmptyState() {
+    return const Center(
+      child: Text(
+        'No activities added yet',
+        style: TextStyle(
+          fontSize: 18,
+          color: Colors.grey,
         ),
       ),
     );
+  }
+
+  Widget _buildAddButton() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ActivityScreenWidget(petId: widget.petId),
+            ),
+          );
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFFEADDFF),
+          foregroundColor: const Color(0xFF65558F),
+          minimumSize: const Size(double.infinity, 50),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+        ),
+        child: const Text('Add', style: TextStyle(fontSize: 16)),
+      ),
+    );
+  }
+}
+
+extension StringExtension on String {
+  String capitalize() {
+    return "${this[0].toUpperCase()}${this.substring(1)}";
   }
 }
