@@ -101,7 +101,7 @@ class _DiaryWidgetState extends State<DiaryWidget> {
     final items = [
       ('Nutrition Diary', const Color.fromARGB(255, 220, 205, 243), (String petId) => NutritionHistoryWidget(petId: petId)),
       ('Activity Screen', const Color(0xFFD0BCFF), (String petId) => ActivityHistoryWidget(petId: petId)),
-      ('Appointments', const Color(0xFFD0BCFF), (String petId) => AppointmentHistoryWidget()),
+      ('Appointments', const Color(0xFFD0BCFF), (String petId) => AppointmentHistoryWidget(petId: petId)),
       ('Health Info', const Color(0xFFB69DF8), (String petId) => MedicationHistoryWidget()),
       ('Expenses', const Color(0xFF9A82DB), (String petId) => ExpensesHistoryWidget(petId: petId,)),
     ];

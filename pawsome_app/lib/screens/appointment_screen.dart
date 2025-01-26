@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:pawsome_app/widgets/bottom_navigation_widget.dart';
+import 'package:pawsome_app/screens/appointment_history_screen.dart';
 
 class AppointmentWidget extends StatefulWidget {
   final String petId;
@@ -78,6 +80,7 @@ class _AppointmentWidgetState extends State<AppointmentWidget> {
           ],
         ),
       ),
+      bottomNavigationBar: const BottomNavigationBarWidget(currentIndex: 2),
     );
   }
 
@@ -101,7 +104,7 @@ class _AppointmentWidgetState extends State<AppointmentWidget> {
     return TextField(
       controller: _vetNameController,
       decoration: InputDecoration(
-        labelText: 'Vet Name',
+        labelText: 'Name/Place',
         border: OutlineInputBorder(),
         focusedBorder: OutlineInputBorder(
           borderSide: BorderSide(color: Color(0xFF65558F)),
@@ -207,12 +210,19 @@ class _AppointmentWidgetState extends State<AppointmentWidget> {
         )),
         'petId': FirebaseFirestore.instance.doc('pets/${widget.petId}'),
         'purpose': _purposeController.text,
-        'reminder': true,
+        'reminder': _reminder,
         'vetName': _vetNameController.text,
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Appointment saved successfully')),
+      );
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AppointmentHistoryWidget(petId: widget.petId),
+        ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -220,5 +230,4 @@ class _AppointmentWidgetState extends State<AppointmentWidget> {
       );
     }
   }
-
 }
