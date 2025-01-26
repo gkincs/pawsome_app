@@ -1,25 +1,33 @@
 import 'package:flutter/material.dart';
-
-class MedicationItem {
-  final String name;
-  final String dosage;
-
-  MedicationItem({required this.name, required this.dosage});
-}
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:pawsome_app/screens/health_info_screen.dart';
+import 'package:pawsome_app/widgets/bottom_navigation_widget.dart';
 
 class MedicationHistoryWidget extends StatefulWidget {
-  const MedicationHistoryWidget({super.key});
+  final String petId;
+
+  const MedicationHistoryWidget({super.key, required this.petId});
 
   @override
   _MedicationHistoryWidgetState createState() => _MedicationHistoryWidgetState();
 }
 
 class _MedicationHistoryWidgetState extends State<MedicationHistoryWidget> {
-  final List<MedicationItem> medications = [
-    MedicationItem(name: 'Antibiotic', dosage: '1 pill'),
-    MedicationItem(name: 'Vitamin', dosage: '2 pills'),
-    MedicationItem(name: 'Pain killer', dosage: '1/2 pill'),
-  ];
+  late Stream<QuerySnapshot> _medicationsStream;
+
+  @override
+  void initState() {
+    super.initState();
+    _initMedicationsStream();
+  }
+
+  void _initMedicationsStream() {
+    _medicationsStream = FirebaseFirestore.instance
+        .collection('medications')
+        .where('petId', isEqualTo: FirebaseFirestore.instance.doc('pets/${widget.petId}'))
+        .orderBy('startDate', descending: true)
+        .snapshots();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,14 +40,88 @@ class _MedicationHistoryWidgetState extends State<MedicationHistoryWidget> {
             _buildHeader(),
             const Divider(color: Color(0xFFCAC4D0)),
             Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    _buildMedicationSection(),
-                    _buildAddButton(),
-                    const SizedBox(height: 16),
-                  ],
-                ),
+              child: StreamBuilder<QuerySnapshot>(
+                stream: _medicationsStream,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  }
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return _buildEmptyState();
+                  }
+                  return _buildMedicationSection(snapshot.data!.docs);
+                },
+              ),
+            ),
+            _buildAddButton(),
+          ],
+        ),
+      ),
+      bottomNavigationBar: const BottomNavigationBarWidget(currentIndex: 2),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      width: double.infinity,
+      child: const Text(
+        'Medications',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontFamily: 'Roboto',
+          fontSize: 22,
+          fontWeight: FontWeight.w500,
+          color: Colors.black,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMedicationSection(List<QueryDocumentSnapshot> documents) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: documents.length,
+      itemBuilder: (context, index) {
+        Map<String, dynamic> data = documents[index].data() as Map<String, dynamic>;
+        return _buildMedicationCard(data);
+      },
+    );
+  }
+
+  Widget _buildMedicationCard(Map<String, dynamic> medication) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+        side: const BorderSide(
+          color: Color(0xFFEADDFF),
+          width: 1,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              medication['medicationName'],
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF65558F),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Dosage: ${medication['dosage']}',
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.grey,
               ),
             ),
           ],
@@ -48,139 +130,39 @@ class _MedicationHistoryWidgetState extends State<MedicationHistoryWidget> {
     );
   }
 
-  Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {},
-            color: const Color(0xFF65558F),
-          ),
-          const Expanded(
-            child: Text(
-              'Medications',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w500,
-                color: Color(0xFF65558F),
-              ),
-            ),
-          ),
-          const SizedBox(width: 48),
-        ],
+  Widget _buildEmptyState() {
+    return const Center(
+      child: Text(
+        'No medications added yet',
+        style: TextStyle(
+          fontSize: 18,
+          color: Colors.grey,
+        ),
       ),
     );
   }
-
-  Widget _buildMedicationSection() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          const Text(
-            'History',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 16),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: medications.length,
-            itemBuilder: (context, index) {
-              return _buildMedicationCard(medications[index]);
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
- Widget _buildMedicationCard(MedicationItem medication) {
-  return Card(
-    margin: const EdgeInsets.only(bottom: 8),
-    elevation: 0,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(8),
-      side: const BorderSide(
-        color: Color(0xFFEADDFF),
-        width: 1,
-      ),
-    ),
-    child: Padding(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  medication.name,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF65558F),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Dosage: ${medication.dosage}',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.notifications_outlined),
-                onPressed: () {},
-                color: const Color(0xFF65558F),
-                iconSize: 20,
-              ),
-              IconButton(
-                icon: const Icon(Icons.edit_outlined),
-                onPressed: () {},
-                color: const Color(0xFF65558F),
-                iconSize: 20,
-              ),
-            ],
-          ),
-        ],
-      ),
-    ),
-  );
-}
 
   Widget _buildAddButton() {
     return Padding(
       padding: const EdgeInsets.all(16),
-      child: Center(
-        child: SizedBox(
-          width: 120,
-          child: ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFEADDFF),
-              foregroundColor: Color(0xFF65558F),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(100),
-              ),
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HealthInfoWidget(petId: widget.petId),
             ),
-            child: const Text('Add'),
+          );
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFFEADDFF),
+          foregroundColor: const Color(0xFF65558F),
+          minimumSize: const Size(double.infinity, 50),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
           ),
         ),
+        child: const Text('Add', style: TextStyle(fontSize: 16)),
       ),
     );
   }

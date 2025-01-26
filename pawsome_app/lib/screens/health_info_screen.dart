@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:pawsome_app/widgets/bottom_navigation_widget.dart';
 
 class HealthInfoWidget extends StatefulWidget {
   final String petId;
@@ -59,6 +60,7 @@ class _HealthInfoWidgetState extends State<HealthInfoWidget> {
           ),
         ),
       ),
+      bottomNavigationBar: const BottomNavigationBarWidget(currentIndex: 2),
     );
   }
 
@@ -201,15 +203,7 @@ class _HealthInfoWidgetState extends State<HealthInfoWidget> {
         SnackBar(content: Text('Medication saved successfully')),
       );
 
-      // Clear inputs after saving
-      _medicineNameController.clear();
-      _dosageController.clear();
-      setState(() {
-        _selectedFrequency = '/day';
-        _startDate = null;
-        _endDate = null;
-        _reminder = false;
-      });
+      Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error saving medication: $e')),
