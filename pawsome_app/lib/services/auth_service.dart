@@ -26,27 +26,29 @@ class AuthService {
     }
   }
 
-//First login?
-Future<bool> isFirstLogin(String userId) async {
-  try {
-    DocumentSnapshot userDoc = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(userId)
-        .get();
-    return !userDoc.exists;
-  } catch (e) {
-    throw Exception("Failed to check first login status: ${e.toString()}");
+  // First login?
+  Future<bool> isFirstLogin(String userId) async {
+    try {
+      DocumentSnapshot userDoc = await _firestore
+          .collection('users')
+          .doc(userId)
+          .get();
+      return !userDoc.exists;
+    } catch (e) {
+      throw Exception("Failed to check first login status: ${e.toString()}");
+    }
   }
-}
+
   // Save user data to Firestore, with pet references
-  Future<void> saveUserData(String uid, String email, String name, List<String> petIds) async {
+  Future<void> saveUserData(
+      String uid, String email, String name, List<String> petIds) async {
     try {
       List<DocumentReference> petRefs = petIds.isEmpty
           ? []
           : petIds.map((petId) => _firestore.collection('pets').doc(petId)).toList();
 
       DocumentSnapshot userDoc = await _firestore.collection('users').doc(uid).get();
-      
+
       if (!userDoc.exists) {
         await _firestore.collection('users').doc(uid).set({
           'email': email,
@@ -73,7 +75,7 @@ Future<bool> isFirstLogin(String userId) async {
     try {
       DocumentReference petRef = _firestore.collection('pets').doc(petId);
       DocumentSnapshot petSnapshot = await petRef.get();
-      
+
       if (petSnapshot.exists) {
         await _firestore.collection('users').doc(userId).update({
           'pets': FieldValue.arrayUnion([petRef]),
