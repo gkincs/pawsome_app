@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pawsome_app/screens/nutrition_history_screen.dart';
-import 'package:pawsome_app/widgets/bottom_navigation_widget.dart';
 
 class NutritionDiaryWidget extends StatefulWidget {
   final String? petId;
@@ -33,7 +32,6 @@ class _NutritionDiaryWidgetState extends State<NutritionDiaryWidget> {
           ],
         ),
       ),
-      bottomNavigationBar: const BottomNavigationBarWidget(currentIndex: 2),
     );
   }
 

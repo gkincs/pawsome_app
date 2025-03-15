@@ -1,11 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pawsome_app/bloc/bottom_navigation_bloc.dart';
 import 'package:pawsome_app/screens/login_screen.dart';
 import 'package:pawsome_app/screens/pet_screen.dart';
-import 'package:pawsome_app/widgets/bottom_navigation_widget.dart';
 
 class Pet {
   final String id;
@@ -108,22 +105,17 @@ class _HomeWidgetState extends State<HomeWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<BottomNavigationBloc, BottomNavigationState>(
-      builder: (context, state) {
-        return Scaffold(
-          body: SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeader(),
-                const Divider(color: Color(0xFFCAC4D0)),
-                _buildPetsSection(),
-              ],
-            ),
-          ),
-          bottomNavigationBar: const BottomNavigationBarWidget(currentIndex: 0,),
-        );
-      },
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(),
+            const Divider(color: Color(0xFFCAC4D0)),
+            _buildPetsSection(),
+          ],
+        ),
+      ),
     );
   }
 
@@ -177,17 +169,17 @@ class _HomeWidgetState extends State<HomeWidget> {
     );
   }
 
-Widget _buildPetsSection() {
-  return Expanded(
-    child: ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: pets.length,
-      itemBuilder: (context, index) {
-        return _buildPetCard(pets[index]);
-      },
-    ),
-  );
-}
+  Widget _buildPetsSection() {
+    return Expanded(
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: pets.length,
+        itemBuilder: (context, index) {
+          return _buildPetCard(pets[index]);
+        },
+      ),
+    );
+  }
 
   Widget _buildPetCard(Pet pet) {
     return Card(

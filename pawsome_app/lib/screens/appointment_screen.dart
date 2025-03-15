@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:pawsome_app/widgets/bottom_navigation_widget.dart';
 import 'package:pawsome_app/screens/appointment_history_screen.dart';
 
 class AppointmentWidget extends StatefulWidget {
@@ -80,7 +79,6 @@ class _AppointmentWidgetState extends State<AppointmentWidget> {
           ],
         ),
       ),
-      bottomNavigationBar: const BottomNavigationBarWidget(currentIndex: 2),
     );
   }
 

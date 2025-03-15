@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:pawsome_app/screens/nutrition_diary.dart';
-import 'package:pawsome_app/widgets/bottom_navigation_widget.dart';
 
 class NutritionHistoryWidget extends StatefulWidget {
   final String petId;
@@ -61,7 +60,6 @@ class _NutritionHistoryWidgetState extends State<NutritionHistoryWidget> {
           ],
         ),
       ),
-      bottomNavigationBar: const BottomNavigationBarWidget(currentIndex: 2),
     );
   }
 
@@ -179,6 +177,6 @@ class _NutritionHistoryWidgetState extends State<NutritionHistoryWidget> {
 
 extension StringExtension on String {
   String capitalize() {
-    return "${this[0].toUpperCase()}${this.substring(1)}";
+    return "${this[0].toUpperCase()}${substring(1)}";
   }
 }

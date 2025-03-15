@@ -2,16 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pawsome_app/screens/activity_history_screen.dart';
-import 'package:pawsome_app/widgets/bottom_navigation_widget.dart';
 import 'package:pawsome_app/screens/nutrition_history_screen.dart';
 import 'package:pawsome_app/screens/appointment_history_screen.dart';
 import 'package:pawsome_app/screens/medication_history_screen.dart';
 import 'package:pawsome_app/screens/expenses_history_screen.dart';
 
 class DiaryWidget extends StatefulWidget {
-  final String? petId;
-
-  const DiaryWidget({super.key, this.petId});
+  const DiaryWidget({super.key});
 
   @override
   _DiaryWidgetState createState() => _DiaryWidgetState();
@@ -27,6 +24,13 @@ class _DiaryWidgetState extends State<DiaryWidget> {
     super.initState();
     _fetchPets();
   }
+
+    @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _fetchPets(); //Ha a widget függőségei megváltoznak
+  }
+
 
   Future<void> _fetchPets() async {
     try {
@@ -48,17 +52,12 @@ class _DiaryWidgetState extends State<DiaryWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            _buildHeader(),
-            const Divider(color: Color(0xFFCAC4D0)),
-            Expanded(child: _buildDiaryItems()),
-          ],
-        ),
-      ),
-      bottomNavigationBar: const BottomNavigationBarWidget(currentIndex: 2),
+    return Column(
+      children: [
+        _buildHeader(),
+        const Divider(color: Color(0xFFCAC4D0)),
+        Expanded(child: _buildDiaryItems()),
+      ],
     );
   }
 
@@ -103,7 +102,7 @@ class _DiaryWidgetState extends State<DiaryWidget> {
       ('Activity Screen', const Color(0xFFD0BCFF), (String petId) => ActivityHistoryWidget(petId: petId)),
       ('Appointments', const Color(0xFFD0BCFF), (String petId) => AppointmentHistoryWidget(petId: petId)),
       ('Health Info', const Color(0xFFB69DF8), (String petId) => MedicationHistoryWidget(petId: petId)),
-      ('Expenses', const Color(0xFF9A82DB), (String petId) => ExpensesHistoryWidget(petId: petId,)),
+      ('Expenses', const Color(0xFF9A82DB), (String petId) => ExpensesHistoryWidget(petId: petId)),
     ];
 
     return ListView.separated(

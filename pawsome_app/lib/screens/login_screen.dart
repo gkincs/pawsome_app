@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pawsome_app/screens/first_step_screen.dart';
-import 'package:pawsome_app/screens/home_screen.dart';
 import 'package:pawsome_app/screens/new_account_screen.dart';
+import 'package:pawsome_app/screens/main_screen.dart';
 
 class LoginWidget extends StatefulWidget {
   const LoginWidget({super.key});
@@ -115,7 +115,7 @@ class _LoginWidgetState extends State<LoginWidget> {
 
   void _navigateToHome() {
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const HomeWidget()),
+      MaterialPageRoute(builder: (_) => MainScreen()),
     );
   }
 

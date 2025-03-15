@@ -4,9 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pawsome_app/bloc/auth_bloc.dart';
 import 'package:pawsome_app/bloc/bottom_navigation_bloc.dart';
 import 'package:pawsome_app/repositories/user_repository.dart';
+import 'package:pawsome_app/screens/main_screen.dart';
 import 'package:pawsome_app/screens/signin_screen.dart';
 import 'package:pawsome_app/screens/first_step_screen.dart';
-import 'package:pawsome_app/screens/home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,7 +42,7 @@ class Pawsome extends StatelessWidget {
             if (state.isFirstLogin) {
               return const FirststepWidget();
             }
-            return const HomeWidget();
+            return MainScreen();
           },
         ),
       ),

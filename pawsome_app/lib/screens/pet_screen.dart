@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pawsome_app/screens/pet_prof_screen.dart';
-import 'package:pawsome_app/widgets/bottom_navigation_widget.dart';
 
 class PetScreenWidget extends StatefulWidget {
   final String? petId;
@@ -56,17 +55,14 @@ class _PetScreenWidgetState extends State<PetScreenWidget> {
             _buildHeader(),
             const Divider(color: Color(0xFFCAC4D0)),
             Expanded(
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : pets.isNotEmpty
-                      ? _buildPetsList()
-                      : _buildEmptyState(),
+              child: pets.isNotEmpty
+                  ? _buildPetsList() 
+                  : _buildEmptyState(),
             ),
             _buildAddPetButton(),
           ],
         ),
       ),
-      bottomNavigationBar: const BottomNavigationBarWidget(currentIndex: 1),
     );
   }
 
@@ -151,37 +147,37 @@ class _PetScreenWidgetState extends State<PetScreenWidget> {
     );
   }
 
-Widget _buildAddPetButton() {
-  return Padding(
-    padding: const EdgeInsets.all(16),
-    child: ElevatedButton(
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const PetProfileWidget(petId: null),
+  Widget _buildAddPetButton() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const PetProfileWidget(petId: null),
+            ),
+          );
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFFEADDFF),
+          foregroundColor: const Color(0xFF65558F),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(100),
           ),
-        );
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFFEADDFF),
-        foregroundColor: const Color(0xFF65558F),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(100),
+          padding: const EdgeInsets.symmetric(vertical: 15),
+          minimumSize: const Size(120, 50),
         ),
-        padding: const EdgeInsets.symmetric(vertical: 15),
-        minimumSize: const Size(120, 50),
-      ),
-      child: const Text(
-        'Add',
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
+        child: const Text(
+          'Add',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   Widget _buildEmptyState() {
     return const Center(

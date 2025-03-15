@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pawsome_app/screens/health_info_screen.dart';
-import 'package:pawsome_app/widgets/bottom_navigation_widget.dart';
 
 class MedicationHistoryWidget extends StatefulWidget {
   final String petId;
@@ -60,7 +59,6 @@ class _MedicationHistoryWidgetState extends State<MedicationHistoryWidget> {
           ],
         ),
       ),
-      bottomNavigationBar: const BottomNavigationBarWidget(currentIndex: 2),
     );
   }
 

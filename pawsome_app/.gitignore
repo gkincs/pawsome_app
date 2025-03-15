@@ -93,3 +93,4 @@ android/local.properties
 .flutter-plugins
 .flutter-plugins-dependencies
 .generated_plugins.dart
+*.mocks.dart

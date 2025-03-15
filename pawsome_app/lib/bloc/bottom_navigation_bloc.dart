@@ -1,37 +1,54 @@
-import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 // Events
 abstract class BottomNavigationEvent {}
 
-class UpdateIndex extends BottomNavigationEvent {
+class ChangeTabEvent extends BottomNavigationEvent {
   final int index;
-  UpdateIndex(this.index);
+  ChangeTabEvent(this.index);
 }
 
-// Új esemény a tartalom frissítésére
-class UpdateContent extends BottomNavigationEvent {
-  final int index;
-  UpdateContent(this.index);
-}
-
-// State
+// States
 class BottomNavigationState {
-  final int currentIndex; // Aktuális BottomNavigationBar index
-  final int contentIndex; // Aktuális tartalom index (külön a navbar-tól)
+  final int currentIndex;
+  final String currentScreen;
 
-  BottomNavigationState(this.currentIndex, this.contentIndex);
+  BottomNavigationState({
+    this.currentIndex = 0,
+    this.currentScreen = 'Home',
+  });
+
+  BottomNavigationState copyWith({
+    int? currentIndex,
+    String? currentScreen,
+  }) {
+    return BottomNavigationState(
+      currentIndex: currentIndex ?? this.currentIndex,
+      currentScreen: currentScreen ?? this.currentScreen,
+    );
+  }
 }
 
-// BLoC
+// Bloc
 class BottomNavigationBloc extends Bloc<BottomNavigationEvent, BottomNavigationState> {
-  BottomNavigationBloc() : super(BottomNavigationState(0, 0)) {
-    on<UpdateIndex>((event, emit) {
-      emit(BottomNavigationState(event.index, state.contentIndex)); // Csak az index frissül
-    });
-
-    on<UpdateContent>((event, emit) {
-      emit(BottomNavigationState(state.currentIndex, event.index)); // Csak a tartalom frissül
+  BottomNavigationBloc() : super(BottomNavigationState()) {
+    on<ChangeTabEvent>((event, emit) {
+      String screen = 'Home';
+      switch (event.index) {
+        case 0:
+          screen = 'Home';
+          break;
+        case 1:
+          screen = 'Pets';
+          break;
+        case 2:
+          screen = 'Diary';
+          break;
+      }
+      emit(state.copyWith(
+        currentIndex: event.index,
+        currentScreen: screen,
+      ));
     });
   }
 }

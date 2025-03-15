@@ -3,12 +3,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:pawsome_app/widgets/bottom_navigation_widget.dart';
 
 class PetProfileWidget extends StatefulWidget {
   final String? petId;
 
-  const PetProfileWidget({Key? key, required this.petId}) : super(key: key);
+  const PetProfileWidget({super.key, required this.petId});
 
   @override
   _PetProfileWidgetState createState() => _PetProfileWidgetState();
@@ -215,7 +214,6 @@ final Map<String, List<String>> _breeds = {
           ],
         ),
       ),
-      bottomNavigationBar: const BottomNavigationBarWidget(currentIndex: 1),
     );
   }
 

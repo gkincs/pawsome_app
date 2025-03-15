@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pawsome_app/screens/first_step_screen.dart';
-import 'package:pawsome_app/screens/home_screen.dart';
+import 'package:pawsome_app/screens/main_screen.dart';
 import 'package:pawsome_app/screens/login_screen.dart';
 import 'package:pawsome_app/screens/signin_screen.dart';
 
@@ -42,7 +42,7 @@ class ScreenManager extends StatelessWidget {
                 if (loginSnapshot.data!) {
                   return const FirststepWidget();
                 } else {
-                  return const HomeWidget();
+                  return MainScreen();
                 }
               }
 

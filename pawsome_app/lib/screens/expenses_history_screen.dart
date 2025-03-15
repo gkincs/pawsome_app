@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pawsome_app/screens/expenses_screen.dart';
-import 'package:pawsome_app/widgets/bottom_navigation_widget.dart';
 
 class ExpensesHistoryWidget extends StatefulWidget {
   final String petId;
@@ -74,7 +73,6 @@ class _ExpensesHistoryWidgetState extends State<ExpensesHistoryWidget> {
           ],
         ),
       ),
-      bottomNavigationBar: const BottomNavigationBarWidget(currentIndex: 2),
     );
   }
 

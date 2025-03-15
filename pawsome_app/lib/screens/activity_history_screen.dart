@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:pawsome_app/screens/activity_screen.dart';
-import 'package:pawsome_app/widgets/bottom_navigation_widget.dart';
 
 class ActivityHistoryWidget extends StatefulWidget {
   final String petId;
@@ -75,7 +74,6 @@ class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
           ],
         ),
       ),
-      bottomNavigationBar: const BottomNavigationBarWidget(currentIndex: 2),
     );
   }
 
@@ -191,6 +189,6 @@ class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
 
 extension StringExtension on String {
   String capitalize() {
-    return "${this[0].toUpperCase()}${this.substring(1)}";
+    return "${this[0].toUpperCase()}${substring(1)}";
   }
 }
