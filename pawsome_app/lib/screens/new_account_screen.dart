@@ -104,7 +104,7 @@ class _NewAccountWidgetState extends State<NewAccountWidget> {
           onPressed: () {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => const LoginWidget()),
+              MaterialPageRoute(builder: (context) => LoginWidget()),
             );
           },
           child: const Text(
@@ -145,7 +145,7 @@ class _NewAccountWidgetState extends State<NewAccountWidget> {
           );
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const LoginWidget()),
+            MaterialPageRoute(builder: (context) => LoginWidget()),
           );
         }
       } catch (e) {

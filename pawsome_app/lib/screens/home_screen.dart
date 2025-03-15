@@ -147,7 +147,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                 try {
                   await FirebaseAuth.instance.signOut();
                   Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => const LoginWidget()),
+                    MaterialPageRoute(builder: (context) => LoginWidget()),
                   );
                 } catch (e) {
                   print('Error during logout: $e');

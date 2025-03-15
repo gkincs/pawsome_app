@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pawsome_app/screens/first_step_screen.dart';
 import 'package:pawsome_app/screens/new_account_screen.dart';
 import 'package:pawsome_app/screens/main_screen.dart';
@@ -17,6 +18,33 @@ class _LoginWidgetState extends State<LoginWidget> {
   final TextEditingController _passwordController = TextEditingController();
   bool _rememberMe = false;
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRememberMe();
+  }
+
+  Future<void> _loadRememberMe() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _rememberMe = prefs.getBool('remember_me') ?? false;
+      if (_rememberMe) {
+        _emailController.text = prefs.getString('saved_email') ?? '';
+      }
+    });
+  }
+
+  Future<void> _saveRememberMe() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (_rememberMe) {
+      await prefs.setBool('remember_me', true);
+      await prefs.setString('saved_email', _emailController.text.trim());
+    } else {
+      await prefs.remove('remember_me');
+      await prefs.remove('saved_email');
+    }
+  }
 
   @override
   void dispose() {
@@ -52,6 +80,7 @@ class _LoginWidgetState extends State<LoginWidget> {
       if (!mounted) return;
       
       if (credential.user != null) {
+        await _saveRememberMe();
         _showMessage('Login successful!', success: true);
 
         bool isFirstLogin = await _isFirstLogin(credential.user!.uid);

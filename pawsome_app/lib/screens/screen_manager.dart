@@ -46,7 +46,7 @@ class ScreenManager extends StatelessWidget {
                 }
               }
 
-              return const LoginWidget();
+              return LoginWidget();
             },
           );
         }
