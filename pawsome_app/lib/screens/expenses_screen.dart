@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pawsome_app/screens/expenses_history_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ExpensesWidget extends StatefulWidget {
   final String? petId;
@@ -149,11 +150,20 @@ class _ExpensesWidgetState extends State<ExpensesWidget> {
     }
 
     try {
+      String? userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error: User not logged in')),
+        );
+        return;
+      }
+
       await _firestore.collection('expenses').add({
         'amount': _priceController.text,
         'date': FieldValue.serverTimestamp(),
         'description': selectedCategory,
         'petId': widget.petId,
+        'userId': userId,
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
