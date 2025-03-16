@@ -86,12 +86,13 @@ class _NutritionHistoryWidgetState extends State<NutritionHistoryWidget> {
       itemCount: documents.length,
       itemBuilder: (context, index) {
         Map<String, dynamic> data = documents[index].data() as Map<String, dynamic>;
-        return _buildNutritionCard(data);
+        String docId = documents[index].id;
+        return _buildNutritionCard(data, docId);
       },
     );
   }
 
-  Widget _buildNutritionCard(Map<String, dynamic> item) {
+  Widget _buildNutritionCard(Map<String, dynamic> item, String docId) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       elevation: 0,
@@ -102,39 +103,64 @@ class _NutritionHistoryWidgetState extends State<NutritionHistoryWidget> {
           width: 1,
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
+      child: ListTile(
+        contentPadding: const EdgeInsets.all(16),
+        title: Text(
+          item['foodType'].toString().capitalize(),
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF65558F),
+          ),
+        ),
+        subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              item['foodType'].toString().capitalize(),
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: Color(0xFF65558F),
-              ),
-            ),
             const SizedBox(height: 4),
             Text(
               'Amount: ${item['amount']}',
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-              ),
+              style: const TextStyle(fontSize: 14, color: Colors.grey),
             ),
             const SizedBox(height: 4),
             Text(
-              'Date: ${DateFormat('MMM d, y HH:mm').format((item['date'] as Timestamp).toDate())}',
-              style: const TextStyle(
-                fontSize: 12,
-                color: Colors.grey,
-              ),
+              'Date: ${item['date'] != null ? DateFormat('MMM d, y HH:mm').format((item['date'] as Timestamp).toDate()) : 'No Date'}',
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ],
         ),
+        trailing: IconButton(
+          icon: const Icon(Icons.close, color: Colors.red),
+          onPressed: () => _confirmDelete(docId),
+        ),
       ),
     );
+  }
+
+  void _confirmDelete(String docId) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Entry'),
+        content: const Text('Are you sure you want to delete this feeding entry?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              _deleteEntry(docId);
+              Navigator.pop(context);
+            },
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _deleteEntry(String docId) {
+    FirebaseFirestore.instance.collection('feedingLogs').doc(docId).delete();
   }
 
   Widget _buildEmptyState() {

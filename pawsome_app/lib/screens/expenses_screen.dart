@@ -153,7 +153,7 @@ class _ExpensesWidgetState extends State<ExpensesWidget> {
         'amount': _priceController.text,
         'date': FieldValue.serverTimestamp(),
         'description': selectedCategory,
-        'petId': _firestore.doc('pets/${widget.petId}'),
+        'petId': widget.petId,
       });
 
       ScaffoldMessenger.of(context).showSnackBar(

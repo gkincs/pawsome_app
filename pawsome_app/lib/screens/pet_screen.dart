@@ -6,7 +6,7 @@ import 'package:pawsome_app/screens/pet_prof_screen.dart';
 class PetScreenWidget extends StatefulWidget {
   final String? petId;
 
-  const PetScreenWidget({Key? key, this.petId}) : super(key: key);
+  const PetScreenWidget({super.key, this.petId});
 
   @override
   _PetScreenWidgetState createState() => _PetScreenWidgetState();

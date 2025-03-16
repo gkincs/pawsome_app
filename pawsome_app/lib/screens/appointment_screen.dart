@@ -206,7 +206,7 @@ class _AppointmentWidgetState extends State<AppointmentWidget> {
           selectedTime.hour,
           selectedTime.minute,
         )),
-        'petId': FirebaseFirestore.instance.doc('pets/${widget.petId}'),
+        'petId': widget.petId,
         'purpose': _purposeController.text,
         'reminder': _reminder,
         'vetName': _vetNameController.text,
