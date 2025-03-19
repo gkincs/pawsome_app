@@ -58,6 +58,8 @@ class _LoginWidgetState extends State<LoginWidget> {
   Future<void> _performLogin() async {
     if (_isLoading) return;
 
+    final l10n = AppLocalizations.of(context)!;
+    
     setState(() {
       _isLoading = true;
     });
@@ -66,7 +68,7 @@ class _LoginWidgetState extends State<LoginWidget> {
     final password = _passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
-      _showMessage('Please fill in both fields.');
+      _showMessage(l10n.fillAllFields);
       setState(() {
         _isLoading = false;
       });
@@ -83,28 +85,38 @@ class _LoginWidgetState extends State<LoginWidget> {
       
       if (credential.user != null) {
         await _saveRememberMe();
-        _showMessage('Login successful!', success: true);
+        _showMessage(l10n.success, success: true);
 
         bool isFirstLogin = await _isFirstLogin(credential.user!.uid);
         if (isFirstLogin) {
-          _navigateToFirstStep();
+          if (!mounted) return;
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => const FirststepWidget()),
+            (route) => false,
+          );
         } else {
-          _navigateToHome();
+          if (!mounted) return;
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => MainScreen()),
+            (route) => false,
+          );
         }
       }
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
 
       if (e.code == 'user-not-found') {
-        _showMessage('No user found for that email.');
+        _showMessage(l10n.error);
       } else if (e.code == 'wrong-password') {
-        _showMessage('Wrong password provided.');
+        _showMessage(l10n.error);
       } else {
-        _showMessage('Login failed. Please try again.');
+        _showMessage(l10n.error);
       }
     } catch (e) {
       if (!mounted) return;
-      _showMessage('An error occurred. Please try again later.');
+      _showMessage(l10n.error);
     } finally {
       if (mounted) {
         setState(() {

@@ -23,15 +23,17 @@ abstract class AuthEvent {}
 class LoginEvent extends AuthEvent {
   final String email;
   final String password;
-  final String name;
-  final List<String> petIds;
 
   LoginEvent({
     required this.email,
     required this.password,
-    required this.name,
-    required this.petIds,
   });
+}
+
+class CheckFirstLoginEvent extends AuthEvent {
+  final User user;
+
+  CheckFirstLoginEvent(this.user);
 }
 
 class LogoutEvent extends AuthEvent {}
@@ -42,25 +44,29 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc(this._userRepository) : super(AuthState()) {
     on<LoginEvent>(_onLogin);
     on<LogoutEvent>(_onLogout);
+    on<CheckFirstLoginEvent>(_onCheckFirstLogin);
   }
 
   Future<void> _onLogin(LoginEvent event, Emitter<AuthState> emit) async {
     try {
       emit(AuthState(isLoading: true));
-
       User? user = await _userRepository.signIn(event.email, event.password);
+      
       if (user != null) {
         bool isFirstLogin = await _userRepository.isFirstLogin(user.uid);
-        await _userRepository.saveUserData(
-          user.uid,
-          event.email,
-          event.name,
-          event.petIds,
-        );
         emit(AuthState(user: user, isFirstLogin: isFirstLogin));
       } else {
         emit(AuthState(errorMessage: "Login failed"));
       }
+    } catch (e) {
+      emit(AuthState(errorMessage: e.toString()));
+    }
+  }
+
+  Future<void> _onCheckFirstLogin(CheckFirstLoginEvent event, Emitter<AuthState> emit) async {
+    try {
+      bool isFirstLogin = await _userRepository.isFirstLogin(event.user.uid);
+      emit(AuthState(user: event.user, isFirstLogin: isFirstLogin));
     } catch (e) {
       emit(AuthState(errorMessage: e.toString()));
     }

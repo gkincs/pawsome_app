@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:pawsome_app/screens/medication_history_screen.dart';
 
 class HealthInfoWidget extends StatefulWidget {
   final String petId;
@@ -28,33 +30,34 @@ class _HealthInfoWidgetState extends State<HealthInfoWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(24),
+          padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeader(),
-              SizedBox(height: 24),
-              _buildInputField(_medicineNameController, 'Medicine Name'),
-              SizedBox(height: 16),
+              _buildHeader(l10n),
+              const SizedBox(height: 24),
+              _buildInputField(_medicineNameController, l10n.medicationName),
+              const SizedBox(height: 16),
               Row(
                 children: [
-                  Expanded(child: _buildInputField(_dosageController, 'Dosage', hintText: '2 tabs')),
-                  SizedBox(width: 16),
-                  Expanded(child: _buildFrequencyDropdown()),
+                  Expanded(child: _buildInputField(_dosageController, l10n.dosage, hintText: '2 tabs')),
+                  const SizedBox(width: 16),
+                  Expanded(child: _buildFrequencyDropdown(l10n)),
                 ],
               ),
-              SizedBox(height: 16),
-              _buildDatePicker('Start Date', _startDate, (date) => setState(() => _startDate = date)),
-              SizedBox(height: 16),
-              _buildDatePicker('End Date', _endDate, (date) => setState(() => _endDate = date)),
-              SizedBox(height: 16),
-              _buildReminderCheckbox(),
-              SizedBox(height: 24),
-              _buildSaveButton(),
+              const SizedBox(height: 16),
+              _buildDatePicker(l10n.startDate, _startDate, (date) => setState(() => _startDate = date)),
+              const SizedBox(height: 16),
+              _buildDatePicker(l10n.endDate, _endDate, (date) => setState(() => _endDate = date)),
+              const SizedBox(height: 16),
+              _buildReminderCheckbox(l10n),
+              const SizedBox(height: 24),
+              _buildSaveButton(l10n),
             ],
           ),
         ),
@@ -62,12 +65,12 @@ class _HealthInfoWidgetState extends State<HealthInfoWidget> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(AppLocalizations l10n) {
     return Container(
       alignment: Alignment.center,
       child: Text(
-        'Medications',
-        style: TextStyle(
+        l10n.medications,
+        style: const TextStyle(
           fontFamily: 'Roboto',
           fontSize: 22,
           fontWeight: FontWeight.w500,
@@ -83,27 +86,17 @@ class _HealthInfoWidgetState extends State<HealthInfoWidget> {
       decoration: InputDecoration(
         labelText: label,
         hintText: hintText,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Color(0xFF65558F)),
-        ),
+        border: const OutlineInputBorder(),
       ),
     );
   }
 
-  Widget _buildFrequencyDropdown() {
+  Widget _buildFrequencyDropdown(AppLocalizations l10n) {
     return DropdownButtonFormField<String>(
       value: _selectedFrequency,
       decoration: InputDecoration(
-        labelText: 'Frequency',
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Color(0xFF65558F)),
-        ),
+        labelText: l10n.frequency,
+        border: const OutlineInputBorder(),
       ),
       items: ['/day', '/week', '/month'].map((String value) {
         return DropdownMenuItem<String>(
@@ -112,60 +105,57 @@ class _HealthInfoWidgetState extends State<HealthInfoWidget> {
         );
       }).toList(),
       onChanged: (String? newValue) {
-        setState(() {
-          _selectedFrequency = newValue!;
-        });
+        if (newValue != null) {
+          setState(() {
+            _selectedFrequency = newValue;
+          });
+        }
       },
     );
   }
 
-  Widget _buildDatePicker(String label, DateTime? date, Function(DateTime?) onDateSelected) {
+  Widget _buildDatePicker(String label, DateTime? selectedDate, Function(DateTime) onDateSelected) {
     return InkWell(
       onTap: () async {
-        final selectedDate = await showDatePicker(
+        final DateTime? picked = await showDatePicker(
           context: context,
-          initialDate: date ?? DateTime.now(),
-          firstDate: DateTime(2000),
-          lastDate: DateTime(2100),
+          initialDate: selectedDate ?? DateTime.now(),
+          firstDate: DateTime.now(),
+          lastDate: DateTime(2025),
         );
-        if (selectedDate != null) {
-          onDateSelected(selectedDate);
+        if (picked != null) {
+          onDateSelected(picked);
         }
       },
       child: InputDecorator(
         decoration: InputDecoration(
           labelText: label,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-          suffixIcon: Icon(Icons.calendar_today, size: 16, color: Color(0xFF65558F)),
+          border: const OutlineInputBorder(),
         ),
         child: Text(
-          date != null ? DateFormat('yyyy.MM.dd').format(date) : "yyyy.mm.dd",
-          style: TextStyle(fontSize: 16),
+          selectedDate != null ? DateFormat('yyyy-MM-dd').format(selectedDate) : '',
         ),
       ),
     );
   }
 
-  Widget _buildReminderCheckbox() {
-    return Row(
-      children: [
-        Checkbox(
-          value: _reminder,
-          onChanged: (bool? value) {
-            setState(() {
-              _reminder = value!;
-            });
-          },
-          activeColor: Color(0xFF65558F),
-        ),
-        Text('Set reminder'),
-      ],
+  Widget _buildReminderCheckbox(AppLocalizations l10n) {
+    return CheckboxListTile(
+      title: Text(l10n.reminder),
+      value: _reminder,
+      onChanged: (bool? value) {
+        if (value != null) {
+          setState(() {
+            _reminder = value;
+          });
+        }
+      },
     );
   }
 
-  Widget _buildSaveButton() {
+  Widget _buildSaveButton(AppLocalizations l10n) {
     return ElevatedButton(
-      onPressed: _saveMedication,
+      onPressed: () => _saveMedication(l10n),
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFFEADDFF),
         foregroundColor: const Color(0xFF65558F),
@@ -174,38 +164,46 @@ class _HealthInfoWidgetState extends State<HealthInfoWidget> {
           borderRadius: BorderRadius.circular(30),
         ),
       ),
-      child: const Text('Save', style: TextStyle(fontSize: 16)),
+      child: Text(l10n.save),
     );
   }
 
-  void _saveMedication() async {
+  Future<void> _saveMedication(AppLocalizations l10n) async {
     if (_medicineNameController.text.isEmpty || _dosageController.text.isEmpty || _startDate == null || _endDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please fill in all fields')),
+        SnackBar(content: Text(l10n.fillAllFields)),
       );
       return;
     }
 
     try {
       await FirebaseFirestore.instance.collection('medications').add({
-        'dosage': _dosageController.text + _selectedFrequency,
-        'duration': '${_endDate!.difference(_startDate!).inDays} days',
-        'endDate': Timestamp.fromDate(_endDate!),
-        'medicationName': _medicineNameController.text,
         'petId': FirebaseFirestore.instance.doc('pets/${widget.petId}'),
+        'medicationName': _medicineNameController.text,
+        'dosage': _dosageController.text,
+        'frequency': _selectedFrequency,
+        'startDate': _startDate,
+        'endDate': _endDate,
         'reminder': _reminder,
-        'startDate': Timestamp.fromDate(_startDate!),
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Medication saved successfully')),
-      );
-
-      Navigator.pop(context);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.medicationSaved)),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MedicationHistoryWidget(petId: widget.petId),
+          ),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error saving medication: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${l10n.error}: $e')),
+        );
+      }
     }
   }
 }

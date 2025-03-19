@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pawsome_app/screens/pet_prof_screen.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:pawsome_app/screens/main_screen.dart';
 
 class FirststepWidget extends StatefulWidget {
   const FirststepWidget({super.key});
@@ -13,6 +15,7 @@ class _FirststepWidgetState extends State<FirststepWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -30,9 +33,9 @@ class _FirststepWidgetState extends State<FirststepWidget> {
                       children: [
                         _buildTitle(),
                         const SizedBox(height: 120),
-                        _buildSubtitle(),
+                        _buildSubtitle(l10n),
                         const SizedBox(height: 40),
-                        _buildAddButton(context),
+                        _buildAddButton(context, l10n),
                       ],
                     ),
                   ),
@@ -57,11 +60,11 @@ class _FirststepWidgetState extends State<FirststepWidget> {
     );
   }
 
-  Widget _buildSubtitle() {
-    return const Text(
-      'Add your first pet!',
+  Widget _buildSubtitle(AppLocalizations l10n) {
+    return Text(
+      l10n.addFirstPet,
       textAlign: TextAlign.center,
-      style: TextStyle(
+      style: const TextStyle(
         fontSize: 24,
         fontWeight: FontWeight.normal,
         color: Color.fromRGBO(0, 0, 0, 0.9),
@@ -69,13 +72,27 @@ class _FirststepWidgetState extends State<FirststepWidget> {
     );
   }
 
-  Widget _buildAddButton(BuildContext context) {
+  Widget _buildAddButton(BuildContext context, AppLocalizations l10n) {
     return ElevatedButton(
-      onPressed: () {
-        Navigator.pushReplacement(
+      onPressed: () async {
+        final result = await Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => PetProfileWidget(petId: null)),
+          MaterialPageRoute(
+            builder: (context) => PetProfileWidget(
+              petId: null,
+              isFirstRegistration: true,
+            ),
+          ),
         );
+        
+        if (result == true) {
+          // Ha sikeresen mentette a kisállat profilját, navigáljunk a főképernyőre
+          if (!mounted) return;
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => MainScreen()),
+          );
+        }
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFFEADDFF),
@@ -85,7 +102,7 @@ class _FirststepWidgetState extends State<FirststepWidget> {
           borderRadius: BorderRadius.circular(30),
         ),
       ),
-      child: const Text('Add'),
+      child: Text(l10n.add),
     );
   }
 }

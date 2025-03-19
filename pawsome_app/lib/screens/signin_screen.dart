@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pawsome_app/bloc/bottom_navigation_bloc.dart';
 import 'package:pawsome_app/screens/login_screen.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SigninWidget extends StatefulWidget {
   const SigninWidget({super.key});
@@ -16,6 +16,7 @@ class _SigninWidgetState extends State<SigninWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -35,11 +36,7 @@ class _SigninWidgetState extends State<SigninWidget> {
                       children: [
                         _buildLogo(),
                         const SizedBox(height: 100),
-                        BlocBuilder<BottomNavigationBloc, BottomNavigationState>(
-                          builder: (context, state) {
-                            return _buildSignInButton(context);
-                          },
-                        ),
+                        _buildSignInButton(context, l10n),
                         const SizedBox(height: 16),
                         if (_isSigningIn) const Center(child: CircularProgressIndicator()),
                       ],
@@ -66,23 +63,23 @@ class _SigninWidgetState extends State<SigninWidget> {
     );
   }
 
-  Widget _buildSignInButton(BuildContext context) {
-  return ElevatedButton(
-    onPressed: () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => LoginWidget()),
-      );
-    },
-    style: ElevatedButton.styleFrom(
-      backgroundColor: const Color(0xFFEADDFF),
-      foregroundColor: const Color(0xFF65558F),
-      minimumSize: const Size(double.infinity, 48),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
+  Widget _buildSignInButton(BuildContext context, AppLocalizations l10n) {
+    return ElevatedButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginWidget()),
+        );
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFFEADDFF),
+        foregroundColor: const Color(0xFF65558F),
+        minimumSize: const Size(double.infinity, 48),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
       ),
-    ),
-    child: const Text('Sign in'),
-  );
-}
+      child: Text(l10n.signIn),
+    );
+  }
 }

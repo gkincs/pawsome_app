@@ -94,6 +94,7 @@ class _MedicationHistoryWidgetState extends State<MedicationHistoryWidget> {
   }
 
   Widget _buildMedicationCard(Map<String, dynamic> medication) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       elevation: 0,
@@ -119,7 +120,7 @@ class _MedicationHistoryWidgetState extends State<MedicationHistoryWidget> {
             ),
             const SizedBox(height: 4),
             Text(
-              'Dosage: ${medication['dosage']}',
+              '${l10n.dosage}: ${medication['dosage']}',
               style: const TextStyle(
                 fontSize: 14,
                 color: Colors.grey,

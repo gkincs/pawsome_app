@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pawsome_app/screens/activity_history_screen.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ActivityScreenWidget extends StatefulWidget {
   final String? petId;
@@ -17,6 +18,7 @@ class _ActivityScreenWidgetState extends State<ActivityScreenWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -42,14 +44,15 @@ class _ActivityScreenWidgetState extends State<ActivityScreenWidget> {
   }
 
 Widget _buildHeader() {
+  final l10n = AppLocalizations.of(context)!;
   return Container(
     padding: const EdgeInsets.symmetric(vertical: 16),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text(
-          'Activity Information',
-          style: TextStyle(
+        Text(
+          l10n.activityInformation,
+          style: const TextStyle(
             fontFamily: 'Roboto',
             fontSize: 22,
             fontWeight: FontWeight.w500,
@@ -62,13 +65,20 @@ Widget _buildHeader() {
 }
 
   Widget _buildActivityTypeSection() {
+    final l10n = AppLocalizations.of(context)!;
+    final List<String> activityTypes = [
+      'Walk',
+      'Play',
+      'Training',
+      l10n.other
+    ];
     return Column(
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(vertical: 16),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
           child: Text(
-            'Activity Type',
-            style: TextStyle(
+            l10n.activityType,
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Color(0xFF65558F),
@@ -80,7 +90,7 @@ Widget _buildHeader() {
           alignment: WrapAlignment.center,
           spacing: 8,
           runSpacing: 8,
-          children: ['Walk', 'Play', 'Training', 'Other'].map((type) {
+          children: activityTypes.map((type) {
             return ChoiceChip(
               label: Text(type),
               selected: selectedActivityType == type,
@@ -98,13 +108,20 @@ Widget _buildHeader() {
   }
 
   Widget _buildDurationSection() {
+    final l10n = AppLocalizations.of(context)!;
+    final List<String> durations = [
+      '< 30 min',
+      '30 min',
+      '1 hour',
+      '1+ hour'
+    ];
     return Column(
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(vertical: 16),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
           child: Text(
-            'Duration',
-            style: TextStyle(
+            l10n.duration,
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Color(0xFF65558F),
@@ -116,7 +133,7 @@ Widget _buildHeader() {
           alignment: WrapAlignment.center,
           spacing: 8,
           runSpacing: 8,
-          children: ['< 30 min', '30 min', '1 hour', '1+ hour'].map((duration) {
+          children: durations.map((duration) {
             return ChoiceChip(
               label: Text(duration),
               selected: selectedDuration == duration,
@@ -134,6 +151,7 @@ Widget _buildHeader() {
   }
 
   Widget _buildSaveButton() {
+    final l10n = AppLocalizations.of(context)!;
     return ElevatedButton(
       onPressed: _saveActivityInfo,
       style: ElevatedButton.styleFrom(
@@ -144,21 +162,22 @@ Widget _buildHeader() {
           borderRadius: BorderRadius.circular(30),
         ),
       ),
-      child: const Text('Save', style: TextStyle(fontSize: 16)),
+      child: Text(l10n.save, style: const TextStyle(fontSize: 16)),
     );
   }
 
   void _saveActivityInfo() async {
+    final l10n = AppLocalizations.of(context)!;
     if (widget.petId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error: No pet selected')),
+        SnackBar(content: Text('Error: No pet selected')),
       );
       return;
     }
 
     if (selectedActivityType == null || selectedDuration == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select both activity type and duration')),
+        SnackBar(content: Text('Please select both activity type and duration')),
       );
       return;
     }
@@ -172,7 +191,7 @@ Widget _buildHeader() {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Activity information saved successfully')),
+        SnackBar(content: Text('Activity information saved successfully')),
       );
 
       // Navigate back to ActivityHistoryWidget

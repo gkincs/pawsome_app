@@ -11,6 +11,10 @@ class UserRepository {
   }) : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
        _firestore = firestore ?? FirebaseFirestore.instance;
 
+  User? getCurrentUser() {
+    return _firebaseAuth.currentUser;
+  }
+
   Future<User?> signIn(String email, String password) async {
     try {
       UserCredential userCredential = await _firebaseAuth.signInWithEmailAndPassword(

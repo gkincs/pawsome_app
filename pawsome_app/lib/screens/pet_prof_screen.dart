@@ -7,8 +7,13 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class PetProfileWidget extends StatefulWidget {
   final String? petId;
+  final bool isFirstRegistration;
 
-  const PetProfileWidget({super.key, required this.petId});
+  const PetProfileWidget({
+    super.key, 
+    required this.petId,
+    this.isFirstRegistration = false,
+  });
 
   @override
   _PetProfileWidgetState createState() => _PetProfileWidgetState();
@@ -73,6 +78,7 @@ class _PetProfileWidgetState extends State<PetProfileWidget> {
     if (widget.petId != null) {
       _fetchPetData();
     }
+    _isEditing = widget.isFirstRegistration;
   }
 
   Future<void> _getUserId() async {
@@ -154,6 +160,7 @@ class _PetProfileWidgetState extends State<PetProfileWidget> {
       setState(() {
         _isEditing = false;
       });
+      Navigator.pop(context, true);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.failedToSave(e.toString()))),
@@ -168,18 +175,24 @@ class _PetProfileWidgetState extends State<PetProfileWidget> {
       appBar: AppBar(
         title: Text(l10n.petProfile),
         actions: [
-          IconButton(
-            icon: Icon(_isEditing ? Icons.save : Icons.settings),
-            onPressed: () {
-              if (_isEditing) {
-                _savePetProfile();
-              } else {
-                setState(() {
-                  _isEditing = true;
-                });
-              }
-            },
-          ),
+          if (!widget.isFirstRegistration)
+            IconButton(
+              icon: Icon(_isEditing ? Icons.save : Icons.settings),
+              onPressed: () {
+                if (_isEditing) {
+                  _savePetProfile();
+                } else {
+                  setState(() {
+                    _isEditing = true;
+                  });
+                }
+              },
+            ),
+          if (widget.isFirstRegistration)
+            IconButton(
+              icon: const Icon(Icons.save),
+              onPressed: _savePetProfile,
+            ),
         ],
       ),
       body: SingleChildScrollView(

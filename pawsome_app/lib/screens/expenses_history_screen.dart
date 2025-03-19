@@ -28,6 +28,7 @@ class _ExpensesHistoryWidgetState extends State<ExpensesHistoryWidget> {
       isLoading = true;
     });
 
+    final l10n = AppLocalizations.of(context)!;
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('expenses')
@@ -54,19 +55,20 @@ class _ExpensesHistoryWidgetState extends State<ExpensesHistoryWidget> {
         expenses = [];
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error loading expenses: $e')),
+        SnackBar(content: Text('${l10n.error}: $e')),
       );
     }
   }
 
   Future<void> _deleteExpense(String expenseId) async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       await FirebaseFirestore.instance.collection('expenses').doc(expenseId).delete();
       _fetchExpenses();
     } catch (e) {
       print("Error deleting expense: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error deleting expense: $e')),
+        SnackBar(content: Text('${l10n.error}: $e')),
       );
     }
   }
@@ -178,7 +180,7 @@ class _ExpensesHistoryWidgetState extends State<ExpensesHistoryWidget> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Date: ${DateFormat('MMM d, y').format(expense['date'])}',
+                    '${l10n.date}: ${DateFormat('MMM d, y').format(expense['date'])}',
                     style: const TextStyle(
                       fontSize: 14,
                       color: Colors.grey,

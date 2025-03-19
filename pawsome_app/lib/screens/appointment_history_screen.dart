@@ -51,18 +51,23 @@ class _AppointmentHistoryWidgetState extends State<AppointmentHistoryWidget> {
         isLoading = false;
         appointments = [];
       });
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error loading appointments: $e')),
+        SnackBar(content: Text('${l10n.error}: $e')),
       );
     }
   }
 
   Future<void> _deleteAppointment(String appointmentId) async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       await FirebaseFirestore.instance.collection('vetAppointments').doc(appointmentId).delete();
       _fetchAppointments();
     } catch (e) {
       print("Error deleting appointment: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${l10n.error}: $e')),
+      );
     }
   }
 
@@ -92,7 +97,6 @@ class _AppointmentHistoryWidgetState extends State<AppointmentHistoryWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -143,6 +147,7 @@ class _AppointmentHistoryWidgetState extends State<AppointmentHistoryWidget> {
   }
 
   Widget _buildAppointmentCard(Map<String, dynamic> appointment) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       elevation: 0,
@@ -165,12 +170,12 @@ class _AppointmentHistoryWidgetState extends State<AppointmentHistoryWidget> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Date: ${DateFormat('MMM d, y HH:mm').format(appointment['date'])}',
+                    '${l10n.date}: ${DateFormat('MMM d, y HH:mm').format(appointment['date'])}',
                     style: const TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Place/Name: ${appointment['vetName']}',
+                    '${l10n.veterinarian}: ${appointment['vetName']}',
                     style: const TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                 ],

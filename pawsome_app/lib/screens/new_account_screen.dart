@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pawsome_app/screens/login_screen.dart';
+import 'package:pawsome_app/screens/first_step_screen.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class NewAccountWidget extends StatefulWidget {
   const NewAccountWidget({super.key});
@@ -25,6 +27,7 @@ class _NewAccountWidgetState extends State<NewAccountWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       body: Container(
         color: Colors.white,
@@ -36,9 +39,9 @@ class _NewAccountWidgetState extends State<NewAccountWidget> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  const Text(
-                    'Create a new account',
-                    style: TextStyle(
+                  Text(
+                    l10n.createNewAccount,
+                    style: const TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
@@ -46,11 +49,11 @@ class _NewAccountWidgetState extends State<NewAccountWidget> {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 60),
-                  _buildInputField(_fullNameController, 'Full name'),
+                  _buildInputField(_fullNameController, l10n.fullName),
                   const SizedBox(height: 16),
-                  _buildInputField(_emailController, 'Email', keyboardType: TextInputType.emailAddress),
+                  _buildInputField(_emailController, l10n.email, keyboardType: TextInputType.emailAddress),
                   const SizedBox(height: 16),
-                  _buildInputField(_passwordController, 'Password', isPassword: true),
+                  _buildInputField(_passwordController, l10n.password, isPassword: true),
                   const SizedBox(height: 30),
                   ElevatedButton(
                     onPressed: _createAccount,
@@ -62,10 +65,10 @@ class _NewAccountWidgetState extends State<NewAccountWidget> {
                         borderRadius: BorderRadius.circular(30),
                       ),
                     ),
-                    child: const Text('Create Account'),
+                    child: Text(l10n.createAccount),
                   ),
                   const SizedBox(height: 20),
-                  _buildSignInText(),
+                  _buildSignInText(l10n),
                 ],
               ),
             ),
@@ -92,24 +95,24 @@ class _NewAccountWidgetState extends State<NewAccountWidget> {
     );
   }
 
-  Widget _buildSignInText() {
+  Widget _buildSignInText(AppLocalizations l10n) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text(
-          'Already have an account? ',
-          style: TextStyle(color: Colors.black, fontSize: 14),
+        Text(
+          l10n.alreadyHaveAccount,
+          style: const TextStyle(color: Colors.black, fontSize: 14),
         ),
         TextButton(
           onPressed: () {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => LoginWidget()),
+              MaterialPageRoute(builder: (context) => const LoginWidget()),
             );
           },
-          child: const Text(
-            'Sign in',
-            style: TextStyle(
+          child: Text(
+            l10n.signIn,
+            style: const TextStyle(
               color: Color(0xFF65558F),
               fontSize: 14,
               fontWeight: FontWeight.w500,
@@ -121,6 +124,7 @@ class _NewAccountWidgetState extends State<NewAccountWidget> {
   }
 
   Future<void> _createAccount() async {
+    final l10n = AppLocalizations.of(context)!;
     String fullName = _fullNameController.text.trim();
     String email = _emailController.text.trim();
     String password = _passwordController.text.trim();
@@ -141,24 +145,24 @@ class _NewAccountWidgetState extends State<NewAccountWidget> {
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Account created successfully!')),
+            SnackBar(content: Text(l10n.success)),
           );
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => LoginWidget()),
+            MaterialPageRoute(builder: (context) => const FirststepWidget()),
           );
         }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: $e')),
+            SnackBar(content: Text('${l10n.error}: $e')),
           );
         }
       }
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please fill out all fields!')),
+          SnackBar(content: Text(l10n.fillAllFields)),
         );
       }
     }

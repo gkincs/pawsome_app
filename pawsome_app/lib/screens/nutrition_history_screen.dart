@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:pawsome_app/screens/nutrition_diary.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class NutritionHistoryWidget extends StatefulWidget {
   final String petId;
@@ -31,13 +32,14 @@ class _NutritionHistoryWidgetState extends State<NutritionHistoryWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(),
+            _buildHeader(l10n),
             const Divider(color: Color(0xFFCAC4D0)),
             Expanded(
               child: StreamBuilder<QuerySnapshot>(
@@ -47,30 +49,30 @@ class _NutritionHistoryWidgetState extends State<NutritionHistoryWidget> {
                     return const Center(child: CircularProgressIndicator());
                   }
                   if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
+                    return Center(child: Text('${l10n.error}: ${snapshot.error}'));
                   }
                   if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return _buildEmptyState();
+                    return _buildEmptyState(l10n);
                   }
                   return _buildHistorySection(snapshot.data!.docs);
                 },
               ),
             ),
-            _buildAddButton(),
+            _buildAddButton(l10n),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.all(16),
       width: double.infinity,
-      child: const Text(
-        'Feeding Information',
+      child: Text(
+        l10n.feedingInformation,
         textAlign: TextAlign.center,
-        style: TextStyle(
+        style: const TextStyle(
           fontFamily: 'Roboto',
           fontSize: 22,
           fontWeight: FontWeight.w500,
@@ -93,6 +95,7 @@ class _NutritionHistoryWidgetState extends State<NutritionHistoryWidget> {
   }
 
   Widget _buildNutritionCard(Map<String, dynamic> item, String docId) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       elevation: 0,
@@ -118,12 +121,12 @@ class _NutritionHistoryWidgetState extends State<NutritionHistoryWidget> {
           children: [
             const SizedBox(height: 4),
             Text(
-              'Amount: ${item['amount']}',
+              '${l10n.amount}: ${item['amount']}',
               style: const TextStyle(fontSize: 14, color: Colors.grey),
             ),
             const SizedBox(height: 4),
             Text(
-              'Date: ${item['date'] != null ? DateFormat('MMM d, y HH:mm').format((item['date'] as Timestamp).toDate()) : 'No Date'}',
+              '${l10n.date}: ${item['date'] != null ? DateFormat('MMM d, y HH:mm').format((item['date'] as Timestamp).toDate()) : l10n.noDate}',
               style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ],
@@ -137,22 +140,23 @@ class _NutritionHistoryWidgetState extends State<NutritionHistoryWidget> {
   }
 
   void _confirmDelete(String docId) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Entry'),
-        content: const Text('Are you sure you want to delete this feeding entry?'),
+        title: Text(l10n.deleteEntry),
+        content: Text(l10n.confirmDelete),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () {
               _deleteEntry(docId);
               Navigator.pop(context);
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -163,11 +167,11 @@ class _NutritionHistoryWidgetState extends State<NutritionHistoryWidget> {
     FirebaseFirestore.instance.collection('feedingLogs').doc(docId).delete();
   }
 
-  Widget _buildEmptyState() {
-    return const Center(
+  Widget _buildEmptyState(AppLocalizations l10n) {
+    return Center(
       child: Text(
-        'No information added yet',
-        style: TextStyle(
+        l10n.noFeeding,
+        style: const TextStyle(
           fontSize: 18,
           color: Colors.grey,
         ),
@@ -175,7 +179,7 @@ class _NutritionHistoryWidgetState extends State<NutritionHistoryWidget> {
     );
   }
 
-  Widget _buildAddButton() {
+  Widget _buildAddButton(AppLocalizations l10n) {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: ElevatedButton(
@@ -195,7 +199,7 @@ class _NutritionHistoryWidgetState extends State<NutritionHistoryWidget> {
             borderRadius: BorderRadius.circular(30),
           ),
         ),
-        child: const Text('Add', style: TextStyle(fontSize: 16)),
+        child: Text(l10n.add, style: const TextStyle(fontSize: 16)),
       ),
     );
   }
