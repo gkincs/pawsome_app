@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pawsome_app/screens/expenses_screen.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ExpensesHistoryWidget extends StatefulWidget {
   final String petId;
@@ -71,22 +72,23 @@ class _ExpensesHistoryWidgetState extends State<ExpensesHistoryWidget> {
   }
 
   void _confirmDelete(String expenseId) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Delete Expense"),
-        content: const Text("Are you sure you want to delete this expense?"),
+        title: Text(l10n.delete),
+        content: Text(l10n.confirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               _deleteExpense(expenseId);
             },
-            child: const Text("Delete", style: TextStyle(color: Colors.red)),
+            child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -95,6 +97,7 @@ class _ExpensesHistoryWidgetState extends State<ExpensesHistoryWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -118,12 +121,13 @@ class _ExpensesHistoryWidgetState extends State<ExpensesHistoryWidget> {
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
-      child: const Text(
-        'Expenses',
+      child: Text(
+        l10n.expenses,
         textAlign: TextAlign.center,
-        style: TextStyle(
+        style: const TextStyle(
           fontFamily: 'Roboto',
           fontSize: 22,
           fontWeight: FontWeight.w500,
@@ -144,6 +148,7 @@ class _ExpensesHistoryWidgetState extends State<ExpensesHistoryWidget> {
   }
 
   Widget _buildExpenseCard(Map<String, dynamic> expense) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       elevation: 0,
@@ -204,10 +209,11 @@ class _ExpensesHistoryWidgetState extends State<ExpensesHistoryWidget> {
   }
 
   Widget _buildEmptyState() {
-    return const Center(
+    final l10n = AppLocalizations.of(context)!;
+    return Center(
       child: Text(
-        'No expenses added yet',
-        style: TextStyle(
+        l10n.noExpenses,
+        style: const TextStyle(
           fontSize: 18,
           color: Colors.grey,
         ),
@@ -216,6 +222,7 @@ class _ExpensesHistoryWidgetState extends State<ExpensesHistoryWidget> {
   }
 
   Widget _buildAddButton() {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.all(16),
       child: ElevatedButton(
@@ -235,7 +242,7 @@ class _ExpensesHistoryWidgetState extends State<ExpensesHistoryWidget> {
             borderRadius: BorderRadius.circular(30),
           ),
         ),
-        child: const Text('Add', style: TextStyle(fontSize: 16)),
+        child: Text(l10n.add, style: const TextStyle(fontSize: 16)),
       ),
     );
   }

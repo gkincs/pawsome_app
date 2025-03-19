@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pawsome_app/screens/first_step_screen.dart';
 import 'package:pawsome_app/screens/new_account_screen.dart';
 import 'package:pawsome_app/screens/main_screen.dart';
+import 'package:pawsome_app/widgets/language_switcher.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class LoginWidget extends StatefulWidget {
   const LoginWidget({super.key});
@@ -156,8 +158,17 @@ class _LoginWidgetState extends State<LoginWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: const [
+          LanguageSwitcher(),
+          SizedBox(width: 8),
+        ],
+      ),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -171,9 +182,9 @@ class _LoginWidgetState extends State<LoginWidget> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        const Text(
-                          'Login to your account',
-                          style: TextStyle(
+                        Text(
+                          l10n.loginToAccount,
+                          style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
@@ -183,23 +194,23 @@ class _LoginWidgetState extends State<LoginWidget> {
                         const SizedBox(height: 20),
                         _buildTextField(
                           _emailController,
-                          'Email',
+                          l10n.email,
                           false,
                           TextInputType.emailAddress,
                         ),
                         const SizedBox(height: 20),
                         _buildTextField(
                           _passwordController,
-                          'Password',
+                          l10n.password,
                           true,
                           TextInputType.text,
                         ),
                         const SizedBox(height: 10),
-                        _buildRememberMeAndForgotPassword(),
+                        _buildRememberMeAndForgotPassword(l10n),
                         const SizedBox(height: 20),
-                        _buildLoginButton(),
+                        _buildLoginButton(l10n),
                         const SizedBox(height: 20),
-                        _buildSignUpSection(),
+                        _buildSignUpSection(l10n),
                       ],
                     ),
                   ),
@@ -230,7 +241,7 @@ class _LoginWidgetState extends State<LoginWidget> {
     );
   }
 
-  Widget _buildRememberMeAndForgotPassword() {
+  Widget _buildRememberMeAndForgotPassword(AppLocalizations l10n) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -244,20 +255,20 @@ class _LoginWidgetState extends State<LoginWidget> {
                 });
               },
             ),
-            const Text('Remember me'),
+            Text(l10n.rememberMe),
           ],
         ),
         TextButton(
           onPressed: () {
             // Forgot password logic
           },
-          child: const Text('Forgot password?'),
+          child: Text(l10n.forgotPassword),
         ),
       ],
     );
   }
 
-  Widget _buildLoginButton() {
+  Widget _buildLoginButton(AppLocalizations l10n) {
     return ElevatedButton(
       onPressed: _isLoading ? null : _performLogin,
       style: ElevatedButton.styleFrom(
@@ -270,20 +281,20 @@ class _LoginWidgetState extends State<LoginWidget> {
       ),
       child: _isLoading
           ? const CircularProgressIndicator(color: Colors.white)
-          : const Text('Login'),
+          : Text(l10n.login),
     );
   }
 
-  Widget _buildSignUpSection() {
+  Widget _buildSignUpSection(AppLocalizations l10n) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text("Don't have an account?"),
+        Text(l10n.dontHaveAccount),
         TextButton(
           onPressed: _navigateToSignUp,
-          child: const Text(
-            'Sign up',
-            style: TextStyle(
+          child: Text(
+            l10n.signUp,
+            style: const TextStyle(
               color: Color(0xFF65558F),
               fontWeight: FontWeight.w500,
             ),

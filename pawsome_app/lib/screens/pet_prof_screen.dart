@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class PetProfileWidget extends StatefulWidget {
   final String? petId;
@@ -24,46 +25,46 @@ class _PetProfileWidgetState extends State<PetProfileWidget> {
   String? _userId;
   bool _isEditing = false;
 
-final List<String> _species = ['Dog', 'Cat', 'Bird', 'Fish', 'Reptile', 'Small Mammal', 'Horse', 'Farm Animal', 'Exotic'];
+  final List<String> _species = ['Dog', 'Cat', 'Bird', 'Fish', 'Reptile', 'Small Mammal', 'Horse', 'Farm Animal', 'Exotic'];
 
-final Map<String, List<String>> _breeds = {
-  'Dog': [
-    'Labrador Retriever', 'German Shepherd', 'Golden Retriever', 'French Bulldog', 'Bulldog',
-    'Poodle', 'Beagle', 'Rottweiler', 'Dachshund', 'Yorkshire Terrier', 'Boxer', 'Siberian Husky',
-    'Great Dane', 'Doberman Pinscher', 'Shih Tzu', 'Chihuahua', 'Pug', 'Border Collie'
-  ],
-  'Cat': [
-    'Persian', 'Maine Coon', 'British Shorthair', 'Siamese', 'Ragdoll', 'Sphynx', 'Bengal',
-    'Scottish Fold', 'Abyssinian', 'Russian Blue', 'Norwegian Forest Cat', 'Burmese',
-    'Siberian', 'Birman', 'American Shorthair', 'Oriental Shorthair', 'Exotic Shorthair'
-  ],
-  'Bird': [
-    'Parrot', 'Canary', 'Finch', 'Cockatiel', 'Budgerigar', 'Lovebird', 'Cockatoo',
-    'African Grey', 'Macaw', 'Conure', 'Dove', 'Pigeon', 'Quaker Parrot', 'Eclectus'
-  ],
-  'Fish': [
-    'Goldfish', 'Betta', 'Guppy', 'Angelfish', 'Neon Tetra', 'Molly', 'Platy', 'Discus',
-    'Clownfish', 'Oscar', 'Zebrafish', 'Swordtail', 'Corydoras', 'Rainbowfish'
-  ],
-  'Reptile': [
-    'Bearded Dragon', 'Leopard Gecko', 'Ball Python', 'Corn Snake', 'Chameleon',
-    'Green Iguana', 'Red-Eared Slider', 'Blue-Tongued Skink', 'Crested Gecko'
-  ],
-  'Small Mammal': [
-    'Hamster', 'Rabbit', 'Guinea Pig', 'Ferret', 'Gerbil', 'Rat', 'Mouse', 'Chinchilla',
-    'Hedgehog', 'Sugar Glider', 'Degu', 'Dwarf Hamster'
-  ],
-  'Horse': [
-    'Arabian', 'Quarter Horse', 'Thoroughbred', 'Appaloosa', 'Morgan', 'Paint',
-    'Friesian', 'Clydesdale', 'Shetland Pony', 'Andalusian'
-  ],
-  'Farm Animal': [
-    'Llama', 'Alpaca', 'Chicken', 'Cow', 'Pig', 'Sheep', 'Goat', 'Duck', 'Turkey'
-  ],
-  'Exotic': [
-    'Fennec Fox', 'Capybara', 'Axolotl', 'Kinkajou', 'Serval', 'Wallaby'
-  ]
-};
+  final Map<String, List<String>> _breeds = {
+    'Dog': [
+      'Labrador Retriever', 'German Shepherd', 'Golden Retriever', 'French Bulldog', 'Bulldog',
+      'Poodle', 'Beagle', 'Rottweiler', 'Dachshund', 'Yorkshire Terrier', 'Boxer', 'Siberian Husky',
+      'Great Dane', 'Doberman Pinscher', 'Shih Tzu', 'Chihuahua', 'Pug', 'Border Collie', 'Other'
+    ],
+    'Cat': [
+      'Persian', 'Maine Coon', 'British Shorthair', 'Siamese', 'Ragdoll', 'Sphynx', 'Bengal',
+      'Scottish Fold', 'Abyssinian', 'Russian Blue', 'Norwegian Forest Cat', 'Burmese',
+      'Siberian', 'Birman', 'American Shorthair', 'Oriental Shorthair', 'Exotic Shorthair', 'Other'
+    ],
+    'Bird': [
+      'Parrot', 'Canary', 'Finch', 'Cockatiel', 'Budgerigar', 'Lovebird', 'Cockatoo',
+      'African Grey', 'Macaw', 'Conure', 'Dove', 'Pigeon', 'Quaker Parrot', 'Eclectus', 'Other'
+    ],
+    'Fish': [
+      'Goldfish', 'Betta', 'Guppy', 'Angelfish', 'Neon Tetra', 'Molly', 'Platy', 'Discus',
+      'Clownfish', 'Oscar', 'Zebrafish', 'Swordtail', 'Corydoras', 'Rainbowfish', 'Other'
+    ],
+    'Reptile': [
+      'Bearded Dragon', 'Leopard Gecko', 'Ball Python', 'Corn Snake', 'Chameleon',
+      'Green Iguana', 'Red-Eared Slider', 'Blue-Tongued Skink', 'Crested Gecko', 'Other'
+    ],
+    'Small Mammal': [
+      'Hamster', 'Rabbit', 'Guinea Pig', 'Ferret', 'Gerbil', 'Rat', 'Mouse', 'Chinchilla',
+      'Hedgehog', 'Sugar Glider', 'Degu', 'Dwarf Hamster', 'Other'
+    ],
+    'Horse': [
+      'Arabian', 'Quarter Horse', 'Thoroughbred', 'Appaloosa', 'Morgan', 'Paint',
+      'Friesian', 'Clydesdale', 'Shetland Pony', 'Andalusian', 'Other'
+    ],
+    'Farm Animal': [
+      'Llama', 'Alpaca', 'Chicken', 'Cow', 'Pig', 'Sheep', 'Goat', 'Duck', 'Turkey', 'Other'
+    ],
+    'Exotic': [
+      'Fennec Fox', 'Capybara', 'Axolotl', 'Kinkajou', 'Serval', 'Wallaby', 'Other'
+    ]
+  };
 
   @override
   void initState() {
@@ -115,9 +116,10 @@ final Map<String, List<String>> _breeds = {
   }
 
   Future<void> _savePetProfile() async {
+    final l10n = AppLocalizations.of(context)!;
     if (_userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User not logged in.')),
+        SnackBar(content: Text(l10n.userNotLoggedIn)),
       );
       return;
     }
@@ -125,7 +127,7 @@ final Map<String, List<String>> _breeds = {
     final String name = _nameController.text.trim();
     if (name.isEmpty || _selectedSpecies == null || _selectedBreed == null || _selectedDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill out all fields.')),
+        SnackBar(content: Text(l10n.fillAllFields)),
       );
       return;
     }
@@ -135,7 +137,7 @@ final Map<String, List<String>> _breeds = {
       'animalType': _selectedSpecies,
       'breed': _selectedBreed,
       'age': DateTime.now().year - _selectedDate!.year,
-      'gender': _isFemale ? 'Female' : 'Male',
+      'gender': _isFemale ? l10n.female : l10n.male,
       'userId': _userId,
     };
 
@@ -147,23 +149,24 @@ final Map<String, List<String>> _breeds = {
       }
       
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Pet profile saved successfully!')),
+        SnackBar(content: Text(l10n.profileSaved)),
       );
       setState(() {
         _isEditing = false;
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save pet profile: $e')),
+        SnackBar(content: Text(l10n.failedToSave(e.toString()))),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pet Profile'),
+        title: Text(l10n.petProfile),
         actions: [
           IconButton(
             icon: Icon(_isEditing ? Icons.save : Icons.settings),
@@ -186,31 +189,31 @@ final Map<String, List<String>> _breeds = {
           children: [
             _buildProfilePicture(),
             const SizedBox(height: 24),
-            _buildTextField(_nameController, 'Name'),
+            _buildTextField(_nameController, l10n.name),
             const SizedBox(height: 16),
-            _buildDropdown('Species', _species, _selectedSpecies, (value) {
+            _buildDropdown(l10n.species, _species, _selectedSpecies, (value) {
               setState(() {
                 _selectedSpecies = value;
                 _selectedBreed = null;
               });
             }),
             const SizedBox(height: 16),
-              _buildDropdown(
-                'Breed', 
-                _selectedSpecies != null && _breeds.containsKey(_selectedSpecies) 
-                  ? _breeds[_selectedSpecies]! 
-                  : [], 
-                _selectedBreed, 
-                (value) {
-                  setState(() {
-                    _selectedBreed = value;
-                  });
-                }
-              ),
+            _buildDropdown(
+              l10n.breed, 
+              _selectedSpecies != null && _breeds.containsKey(_selectedSpecies) 
+                ? _breeds[_selectedSpecies]! 
+                : [], 
+              _selectedBreed, 
+              (value) {
+                setState(() {
+                  _selectedBreed = value;
+                });
+              }
+            ),
             const SizedBox(height: 16),
             _buildDatePicker(context),
             const SizedBox(height: 24),
-            _buildGenderSelector(),
+            _buildGenderSelector(l10n),
           ],
         ),
       ),
@@ -247,12 +250,11 @@ final Map<String, List<String>> _breeds = {
                 onTap: _pickImage,
                 child: Container(
                   padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF65558F),
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.grey[300]!),
                   ),
-                  child: const Icon(Icons.add, size: 18),
+                  child: const Icon(Icons.edit, size: 16, color: Colors.white),
                 ),
               ),
             ),
@@ -264,23 +266,25 @@ final Map<String, List<String>> _breeds = {
   Widget _buildTextField(TextEditingController controller, String label) {
     return TextField(
       controller: controller,
+      enabled: _isEditing,
       decoration: InputDecoration(
         labelText: label,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        border: const OutlineInputBorder(),
       ),
-      enabled: _isEditing,
     );
   }
 
   Widget _buildDropdown(String label, List<String> items, String? value, Function(String?) onChanged) {
+    if (value == "Other" && !items.contains("Other")) {
+      items = [...items, "Other"];
+    }
+    
     return DropdownButtonFormField<String>(
-      value: items.contains(value) ? value : null,
       decoration: InputDecoration(
         labelText: label,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        border: const OutlineInputBorder(),
       ),
+      value: value,
       items: items.map((String item) {
         return DropdownMenuItem<String>(
           value: item,
@@ -292,40 +296,36 @@ final Map<String, List<String>> _breeds = {
   }
 
   Widget _buildDatePicker(BuildContext context) {
-    return GestureDetector(
+    final l10n = AppLocalizations.of(context)!;
+    return InkWell(
       onTap: _isEditing ? () async {
         final DateTime? picked = await showDatePicker(
           context: context,
           initialDate: _selectedDate ?? DateTime.now(),
-          firstDate: DateTime(1900),
+          firstDate: DateTime(2000),
           lastDate: DateTime.now(),
         );
-        if (picked != null && picked != _selectedDate) {
+        if (picked != null) {
           setState(() {
             _selectedDate = picked;
           });
         }
       } : null,
-      child: AbsorbPointer(
-        child: TextField(
-          controller: TextEditingController(
-            text: _selectedDate != null
-                ? "${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}"
-                : "",
-          ),
-          decoration: InputDecoration(
-            labelText: 'Age',
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            suffixIcon: const Icon(Icons.calendar_today, size: 16),
-          ),
-          enabled: false,
+      child: InputDecorator(
+        decoration: InputDecoration(
+          labelText: l10n.birthDate,
+          border: const OutlineInputBorder(),
+        ),
+        child: Text(
+          _selectedDate != null
+              ? "${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}"
+              : '',
         ),
       ),
     );
   }
 
-  Widget _buildGenderSelector() {
+  Widget _buildGenderSelector(AppLocalizations l10n) {
     return Container(
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey[300]!),
@@ -351,7 +351,7 @@ final Map<String, List<String>> _breeds = {
                     if (_isFemale) const Icon(Icons.check, color: Colors.white, size: 16),
                     if (_isFemale) const SizedBox(width: 4),
                     Text(
-                      'Female',
+                      l10n.female,
                       style: TextStyle(color: _isFemale ? Colors.white : null),
                     ),
                   ],
@@ -377,7 +377,7 @@ final Map<String, List<String>> _breeds = {
                     if (!_isFemale) const Icon(Icons.check, color: Colors.white, size: 16),
                     if (!_isFemale) const SizedBox(width: 4),
                     Text(
-                      'Male',
+                      l10n.male,
                       style: TextStyle(color: !_isFemale ? Colors.white : null),
                     ),
                   ],

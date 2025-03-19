@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pawsome_app/screens/pet_prof_screen.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class PetScreenWidget extends StatefulWidget {
   final String? petId;
@@ -47,147 +48,123 @@ class _PetScreenWidgetState extends State<PetScreenWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(),
+            _buildHeader(l10n),
             const Divider(color: Color(0xFFCAC4D0)),
             Expanded(
-              child: pets.isNotEmpty
-                  ? _buildPetsList() 
-                  : _buildEmptyState(),
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : pets.isNotEmpty
+                      ? _buildPetsList(l10n)
+                      : _buildEmptyState(l10n),
             ),
-            _buildAddPetButton(),
+            _buildAddPetButton(l10n),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.all(16),
-      child: const Text(
-        'Pets',
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          fontFamily: 'Roboto',
-          fontSize: 22,
-          fontWeight: FontWeight.w500,
-          color: Colors.black,
-        ),
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {},
+            color: const Color(0xFF65558F),
+          ),
+          Expanded(
+            child: Text(
+              l10n.pets,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w500,
+                color: Colors.black,
+              ),
+            ),
+          ),
+          const SizedBox(width: 48), // For symmetry
+        ],
       ),
     );
   }
-  
-  Widget _buildPetsList() {
+
+  Widget _buildPetsList(AppLocalizations l10n) {
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(16),
       itemCount: pets.length,
       itemBuilder: (context, index) {
-        return _buildPetCard(pets[index]);
+        final pet = pets[index];
+        return Card(
+          margin: const EdgeInsets.only(bottom: 16),
+          child: ListTile(
+            title: Text(pet['name']),
+            subtitle: Text(pet['breed']),
+            trailing: IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () => _navigateToPetProfile(pet['petId']),
+            ),
+          ),
+        );
       },
     );
   }
 
-  Widget _buildPetCard(Map<String, dynamic> pet) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-        side: const BorderSide(
-          color: Color(0xFFEADDFF),
-          width: 1,
-        ),
-      ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        leading: CircleAvatar(
-          backgroundColor: const Color(0xFF65558F),
-          child: Text(
-            pet['name'][0],
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        title: Text(
-          pet['name'],
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
+  Widget _buildEmptyState(AppLocalizations l10n) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.pets,
+            size: 64,
             color: Color(0xFF65558F),
           ),
-        ),
-        subtitle: Text(
-          pet['breed'],
-          style: const TextStyle(
-            fontSize: 14,
-            color: Colors.grey,
-          ),
-        ),
-        trailing: const Icon(
-          Icons.arrow_forward_ios,
-          color: Color(0xFF65558F),
-          size: 20,
-        ),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => PetProfileWidget(petId: pet['petId']),
+          const SizedBox(height: 16),
+          Text(
+            l10n.noPets,
+            style: const TextStyle(
+              fontSize: 18,
+              color: Colors.black54,
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildAddPetButton() {
+  Widget _buildAddPetButton(AppLocalizations l10n) {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: ElevatedButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const PetProfileWidget(petId: null),
-            ),
-          );
-        },
+        onPressed: () => _navigateToPetProfile(null),
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFEADDFF),
-          foregroundColor: const Color(0xFF65558F),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(100),
-          ),
+          backgroundColor: const Color(0xFF65558F),
+          foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 15),
-          minimumSize: const Size(120, 50),
-        ),
-        child: const Text(
-          'Add',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
           ),
         ),
+        child: Text(l10n.add),
       ),
     );
   }
 
-  Widget _buildEmptyState() {
-    return const Center(
-      child: Text(
-        'No pets added yet!',
-        style: TextStyle(
-          fontSize: 18,
-          color: Colors.grey,
-        ),
+  void _navigateToPetProfile(String? petId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PetProfileWidget(petId: petId),
       ),
-    );
+    ).then((_) => _fetchPets());
   }
 }

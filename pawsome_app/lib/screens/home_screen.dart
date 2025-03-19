@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pawsome_app/screens/login_screen.dart';
 import 'package:pawsome_app/screens/pet_screen.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class Pet {
   final String id;
@@ -285,17 +286,18 @@ class _HomeWidgetState extends State<HomeWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(),
+            _buildHeader(l10n),
             const Divider(color: Color(0xFFCAC4D0)),
-            _buildPetsSection(),
+            _buildPetsSection(l10n),
             _buildNavigationButtons(),
             const SizedBox(height: 16),
-            _buildRecentActivitiesSection(),
+            _buildRecentActivitiesSection(l10n),
             const SizedBox(height: 32),
           ],
         ),
@@ -325,7 +327,13 @@ class _HomeWidgetState extends State<HomeWidget> {
     );
   }
 
-  Widget _buildPetsSection() {
+  Widget _buildPetsSection(AppLocalizations l10n) {
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (allPets.isEmpty) {
+      return Center(child: Text(l10n.noPets));
+    }
     return Expanded(
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
@@ -403,7 +411,7 @@ class _HomeWidgetState extends State<HomeWidget> {
     }
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.all(16),
       child: Row(
@@ -413,11 +421,11 @@ class _HomeWidgetState extends State<HomeWidget> {
             onPressed: () {},
             color: const Color(0xFF65558F),
           ),
-          const Expanded(
+          Expanded(
             child: Text(
-              'PawSome',
+              l10n.appTitle,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w500,
                 color: Colors.black,
@@ -434,7 +442,7 @@ class _HomeWidgetState extends State<HomeWidget> {
             itemBuilder: (context) => [
               PopupMenuItem<String>(
                 value: 'logout',
-                child: Text('Logout'),
+                child: Text(l10n.logout),
               ),
             ],
           ),
@@ -443,7 +451,7 @@ class _HomeWidgetState extends State<HomeWidget> {
     );
   }
 
-  Widget _buildRecentActivitiesSection() {
+  Widget _buildRecentActivitiesSection(AppLocalizations l10n) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
@@ -452,9 +460,9 @@ class _HomeWidgetState extends State<HomeWidget> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Recent Activities',
-                style: TextStyle(
+              Text(
+                l10n.recentActivities,
+                style: const TextStyle(
                   color: Colors.black,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -470,15 +478,19 @@ class _HomeWidgetState extends State<HomeWidget> {
           if (isLoading)
             const Center(child: CircularProgressIndicator())
           else
-            _buildRecentActivitiesList(),
+            _buildRecentActivitiesList(l10n),
         ],
       ),
     );
   }
 
-  Widget _buildRecentActivitiesList() {
+  Widget _buildRecentActivitiesList(AppLocalizations l10n) {
     List<RecentActivity> activities = List.from(recentActivities);
               
+    if (activities.isEmpty) {
+      return Center(child: Text(l10n.noActivities));
+    }
+
     // Ha nincs aktivitás, üres kártyák
     while (activities.length < 2) {
       activities.add(RecentActivity(
@@ -493,122 +505,48 @@ class _HomeWidgetState extends State<HomeWidget> {
     return Column(
       children: activities.map((activity) {
         if (activity.type == 'empty') {
-          return Card(
-            margin: const EdgeInsets.only(bottom: 16),
-            elevation: 4,
-            shadowColor: Colors.black.withOpacity(0.1),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: const BorderSide(
-                color: Color(0xFFEADDFF),
-                width: 1,
-              ),
-            ),
-            child: ListTile(
-              leading: CircleAvatar(
-                backgroundColor: const Color(0xFFEADDFF),
-                child: Icon(
-                  Icons.info_outline,
-                  color: const Color(0xFF65558F),
-                ),
-              ),
-              title: Text(
-                'No Activity Yet',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black,
-                ),
-              ),
-              subtitle: Text(
-                'Add your first activity to see it here',
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
-                ),
-              ),
-            ),
-          );
+          return const SizedBox.shrink();
         }
 
-        IconData activityIcon;
-        String activityText = '';
-
-        switch (activity.type) {
-          case 'appointment':
-            activityIcon = Icons.calendar_today;
-            activityText = 'Appointment: ${activity.description}';
-            break;
-          case 'expense':
-            activityIcon = Icons.attach_money;
-            activityText = 'Expense: ${activity.description}';
-            break;
-          case 'feeding':
-            activityIcon = Icons.restaurant;
-            activityText = 'Feeding: ${activity.description}';
-            break;
-          case 'activity':
-            activityIcon = Icons.directions_run;
-            activityText = 'Activity: ${activity.description}';
-            break;
-          case 'medication':
-            activityIcon = Icons.medical_services;
-            activityText = 'Medication: ${activity.description}';
-            break;
-          default:
-            activityIcon = Icons.info_outline;
-            activityText = activity.description;
-        }
+        String formattedDate = _formatDate(activity.date, l10n);
+        String activityTitle = _getActivityTitle(activity.type, l10n);
 
         return Card(
-          margin: const EdgeInsets.only(bottom: 16),
-          elevation: 4,
-          shadowColor: Colors.black.withOpacity(0.1),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: const BorderSide(
-              color: Color(0xFFEADDFF),
-              width: 1,
-            ),
-          ),
+          margin: const EdgeInsets.only(bottom: 8),
           child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: const Color(0xFFEADDFF),
-              child: Icon(
-                activityIcon,
-                color: const Color(0xFF65558F),
-              ),
-            ),
-            title: Text(
-              activity.petName,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: Colors.black,
-              ),
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  activityText,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
-                  ),
-                ),
-                Text(
-                  'Date: ${DateFormat('MMM d, y').format(activity.date)}',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
-                  ),
-                ),
-              ],
-            ),
+            title: Text('${activity.petName} - $activityTitle'),
+            subtitle: Text('${activity.description}\n$formattedDate'),
           ),
         );
       }).toList(),
     );
+  }
+
+  String _formatDate(DateTime date, AppLocalizations l10n) {
+    final now = DateTime.now();
+    final yesterday = DateTime(now.year, now.month, now.day - 1);
+    final activityDate = DateTime(date.year, date.month, date.day);
+
+    if (activityDate == DateTime(now.year, now.month, now.day)) {
+      return '${l10n.today}, ${DateFormat('HH:mm').format(date)}';
+    } else if (activityDate == yesterday) {
+      return '${l10n.yesterday}, ${DateFormat('HH:mm').format(date)}';
+    }
+    return DateFormat('yyyy.MM.dd. HH:mm').format(date);
+  }
+
+  String _getActivityTitle(String type, AppLocalizations l10n) {
+    switch (type) {
+      case 'feeding':
+        return l10n.nutrition;
+      case 'activity':
+        return l10n.activities;
+      case 'medication':
+        return l10n.medications;
+      case 'empty':
+        return l10n.noActivities; 
+      default:
+        return type;
+    }
   }
 }

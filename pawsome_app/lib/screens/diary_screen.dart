@@ -6,6 +6,7 @@ import 'package:pawsome_app/screens/nutrition_history_screen.dart';
 import 'package:pawsome_app/screens/appointment_history_screen.dart';
 import 'package:pawsome_app/screens/medication_history_screen.dart';
 import 'package:pawsome_app/screens/expenses_history_screen.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class DiaryWidget extends StatefulWidget {
   const DiaryWidget({super.key});
@@ -25,12 +26,11 @@ class _DiaryWidgetState extends State<DiaryWidget> {
     _fetchPets();
   }
 
-    @override
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _fetchPets(); //Ha a widget függőségei megváltoznak
+    _fetchPets();
   }
-
 
   Future<void> _fetchPets() async {
     try {
@@ -52,26 +52,27 @@ class _DiaryWidgetState extends State<DiaryWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
-        _buildHeader(),
+        _buildHeader(l10n),
         const Divider(color: Color(0xFFCAC4D0)),
-        Expanded(child: _buildDiaryItems()),
+        Expanded(child: _buildDiaryItems(l10n)),
       ],
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.all(16),
       color: const Color(0xFFEADDFF).withOpacity(0.25),
       child: Row(
         children: [
-          const Expanded(
+          Expanded(
             child: Text(
-              'Diary',
+              l10n.diary,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.black,
                 fontFamily: 'Roboto',
                 fontSize: 22,
@@ -96,13 +97,13 @@ class _DiaryWidgetState extends State<DiaryWidget> {
     );
   }
 
-  Widget _buildDiaryItems() {
+  Widget _buildDiaryItems(AppLocalizations l10n) {
     final items = [
-      ('Nutrition Diary', const Color.fromARGB(255, 220, 205, 243), (String petId) => NutritionHistoryWidget(petId: petId)),
-      ('Activity Screen', const Color(0xFFD0BCFF), (String petId) => ActivityHistoryWidget(petId: petId)),
-      ('Appointments', const Color(0xFFD0BCFF), (String petId) => AppointmentHistoryWidget(petId: petId)),
-      ('Health Info', const Color(0xFFB69DF8), (String petId) => MedicationHistoryWidget(petId: petId)),
-      ('Expenses', const Color(0xFF9A82DB), (String petId) => ExpensesHistoryWidget(petId: petId)),
+      (l10n.nutrition, const Color.fromARGB(255, 220, 205, 243), (String petId) => NutritionHistoryWidget(petId: petId)),
+      (l10n.activities, const Color(0xFFD0BCFF), (String petId) => ActivityHistoryWidget(petId: petId)),
+      (l10n.appointments, const Color(0xFFD0BCFF), (String petId) => AppointmentHistoryWidget(petId: petId)),
+      (l10n.health, const Color(0xFFB69DF8), (String petId) => MedicationHistoryWidget(petId: petId)),
+      (l10n.expenses, const Color(0xFF9A82DB), (String petId) => ExpensesHistoryWidget(petId: petId)),
     ];
 
     return ListView.separated(
@@ -112,7 +113,7 @@ class _DiaryWidgetState extends State<DiaryWidget> {
       itemBuilder: (context, index) {
         final (title, color, widgetBuilder) = items[index];
         return ElevatedButton(
-          onPressed: () => _showPetSelectionDialog(title, widgetBuilder),
+          onPressed: () => _showPetSelectionDialog(title, widgetBuilder, l10n),
           style: ElevatedButton.styleFrom(
             backgroundColor: color,
             foregroundColor: const Color(0xFF65558F),
@@ -133,7 +134,7 @@ class _DiaryWidgetState extends State<DiaryWidget> {
     );
   }
 
-  void _showPetSelectionDialog(String title, Function(String) widgetBuilder) {
+  void _showPetSelectionDialog(String title, Function(String) widgetBuilder, AppLocalizations l10n) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -148,7 +149,7 @@ class _DiaryWidgetState extends State<DiaryWidget> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Select Pet for $title',
+                  '${l10n.selectPet} $title',
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,

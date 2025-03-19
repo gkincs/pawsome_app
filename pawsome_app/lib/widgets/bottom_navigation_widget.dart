@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pawsome_app/bloc/bottom_navigation_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class BottomNavigationBarWidget extends StatelessWidget {
   final Function(int) onTabTapped;
@@ -12,41 +13,28 @@ class BottomNavigationBarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BlocBuilder<BottomNavigationBloc, BottomNavigationState>(
       builder: (context, state) {
-        return Container(
-          decoration: BoxDecoration(
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.2),
-                spreadRadius: 1,
-                blurRadius: 10,
-                offset: const Offset(0, -3),
-              ),
-            ],
-          ),
-          child: BottomNavigationBar(
-            currentIndex: state.currentIndex,
-            onTap: onTabTapped,
-            type: BottomNavigationBarType.fixed,
-            selectedItemColor: Colors.blue,
-            unselectedItemColor: Colors.grey,
-            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home),
-                label: 'Home',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.pets),
-                label: 'Pets',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.book),
-                label: 'Diary',
-              ),
-            ],
-          ),
+        return BottomNavigationBar(
+          currentIndex: state.currentIndex,
+          onTap: onTabTapped,
+          items: [
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.home),
+              label: l10n.home,
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.pets),
+              label: l10n.pets,
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.book),
+              label: l10n.diary,
+            ),
+          ],
+          selectedItemColor: const Color(0xFF65558F),
+          unselectedItemColor: Colors.grey,
         );
       },
     );

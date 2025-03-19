@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:pawsome_app/screens/appointment_screen.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AppointmentHistoryWidget extends StatefulWidget {
   final String petId;
@@ -66,22 +67,23 @@ class _AppointmentHistoryWidgetState extends State<AppointmentHistoryWidget> {
   }
 
   void _confirmDelete(String appointmentId) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Delete Appointment"),
-        content: const Text("Are you sure you want to delete this appointment?"),
+        title: Text(l10n.delete),
+        content: Text(l10n.confirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               _deleteAppointment(appointmentId);
             },
-            child: const Text("Delete", style: TextStyle(color: Colors.red)),
+            child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -90,6 +92,7 @@ class _AppointmentHistoryWidgetState extends State<AppointmentHistoryWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -113,12 +116,13 @@ class _AppointmentHistoryWidgetState extends State<AppointmentHistoryWidget> {
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
-      child: const Text(
-        'Appointments',
+      child: Text(
+        l10n.appointments,
         textAlign: TextAlign.center,
-        style: TextStyle(
+        style: const TextStyle(
           fontFamily: 'Roboto',
           fontSize: 22,
           fontWeight: FontWeight.w500,
@@ -183,15 +187,17 @@ class _AppointmentHistoryWidgetState extends State<AppointmentHistoryWidget> {
   }
 
   Widget _buildEmptyState() {
-    return const Center(
+    final l10n = AppLocalizations.of(context)!;
+    return Center(
       child: Text(
-        'No appointments added yet',
-        style: TextStyle(fontSize: 18, color: Colors.grey),
+        l10n.noAppointments,
+        style: const TextStyle(fontSize: 18, color: Colors.grey),
       ),
     );
   }
 
   Widget _buildAddButton() {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.all(16),
       child: ElevatedButton(
@@ -212,7 +218,7 @@ class _AppointmentHistoryWidgetState extends State<AppointmentHistoryWidget> {
           minimumSize: const Size(double.infinity, 50),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
         ),
-        child: const Text('Add', style: TextStyle(fontSize: 16)),
+        child: Text(l10n.add, style: const TextStyle(fontSize: 16)),
       ),
     );
   }

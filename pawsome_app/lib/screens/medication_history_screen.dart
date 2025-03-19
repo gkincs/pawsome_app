@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pawsome_app/screens/health_info_screen.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MedicationHistoryWidget extends StatefulWidget {
   final String petId;
@@ -30,6 +31,7 @@ class _MedicationHistoryWidgetState extends State<MedicationHistoryWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -63,13 +65,14 @@ class _MedicationHistoryWidgetState extends State<MedicationHistoryWidget> {
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       width: double.infinity,
-      child: const Text(
-        'Medications',
+      child: Text(
+        l10n.medications,
         textAlign: TextAlign.center,
-        style: TextStyle(
+        style: const TextStyle(
           fontFamily: 'Roboto',
           fontSize: 22,
           fontWeight: FontWeight.w500,
@@ -129,10 +132,11 @@ class _MedicationHistoryWidgetState extends State<MedicationHistoryWidget> {
   }
 
   Widget _buildEmptyState() {
-    return const Center(
+    final l10n = AppLocalizations.of(context)!;
+    return Center(
       child: Text(
-        'No medications added yet',
-        style: TextStyle(
+        l10n.noMedications,
+        style: const TextStyle(
           fontSize: 18,
           color: Colors.grey,
         ),
@@ -141,6 +145,7 @@ class _MedicationHistoryWidgetState extends State<MedicationHistoryWidget> {
   }
 
   Widget _buildAddButton() {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.all(16),
       child: ElevatedButton(
@@ -160,7 +165,7 @@ class _MedicationHistoryWidgetState extends State<MedicationHistoryWidget> {
             borderRadius: BorderRadius.circular(30),
           ),
         ),
-        child: const Text('Add', style: TextStyle(fontSize: 16)),
+        child: Text(l10n.add, style: const TextStyle(fontSize: 16)),
       ),
     );
   }
