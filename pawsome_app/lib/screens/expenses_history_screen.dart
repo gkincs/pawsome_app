@@ -14,87 +14,20 @@ class ExpensesHistoryWidget extends StatefulWidget {
 }
 
 class _ExpensesHistoryWidgetState extends State<ExpensesHistoryWidget> {
-  List<Map<String, dynamic>> expenses = [];
-  bool isLoading = true;
+  late Stream<QuerySnapshot> _expensesStream;
 
   @override
   void initState() {
     super.initState();
-    _fetchExpenses();
+    _initExpensesStream();
   }
 
-  Future<void> _fetchExpenses() async {
-    setState(() {
-      isLoading = true;
-    });
-
-    final l10n = AppLocalizations.of(context)!;
-    try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('expenses')
-          .where('petId', isEqualTo: widget.petId)
-          .orderBy('date', descending: true)
-          .get();
-
-      setState(() {
-        expenses = querySnapshot.docs.map((doc) {
-          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-          return {
-            'id': doc.id,
-            'description': data['description'] ?? '',
-            'amount': data['amount'] ?? '',
-            'date': (data['date'] as Timestamp).toDate(),
-          };
-        }).toList();
-        isLoading = false;
-      });
-    } catch (e) {
-      print("Error fetching expenses: $e");
-      setState(() {
-        isLoading = false;
-        expenses = [];
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${l10n.error}: $e')),
-      );
-    }
-  }
-
-  Future<void> _deleteExpense(String expenseId) async {
-    final l10n = AppLocalizations.of(context)!;
-    try {
-      await FirebaseFirestore.instance.collection('expenses').doc(expenseId).delete();
-      _fetchExpenses();
-    } catch (e) {
-      print("Error deleting expense: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${l10n.error}: $e')),
-      );
-    }
-  }
-
-  void _confirmDelete(String expenseId) {
-    final l10n = AppLocalizations.of(context)!;
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.delete),
-        content: Text(l10n.confirm),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n.cancel),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _deleteExpense(expenseId);
-            },
-            child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
+  void _initExpensesStream() {
+    _expensesStream = FirebaseFirestore.instance
+        .collection('expenses')
+        .where('petId', isEqualTo: widget.petId)
+        .orderBy('date', descending: true)
+        .snapshots();
   }
 
   @override
@@ -106,24 +39,39 @@ class _ExpensesHistoryWidgetState extends State<ExpensesHistoryWidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(),
+            _buildHeader(l10n),
             const Divider(color: Color(0xFFCAC4D0)),
             Expanded(
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : expenses.isEmpty
-                      ? _buildEmptyState()
-                      : _buildHistorySection(),
+              child: StreamBuilder<QuerySnapshot>(
+                stream: _expensesStream,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (snapshot.hasError) {
+                    return Center(child: Text('${l10n.error}: ${snapshot.error}'));
+                  }
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return _buildEmptyState(l10n);
+                  }
+                  return ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: (context, index) {
+                      return _buildExpenseCard(snapshot.data!.docs[index], l10n);
+                    },
+                  );
+                },
+              ),
             ),
-            _buildAddButton(),
+            _buildAddButton(l10n),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
-    final l10n = AppLocalizations.of(context)!;
+  Widget _buildHeader(AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.all(16),
       child: Text(
@@ -139,18 +87,10 @@ class _ExpensesHistoryWidgetState extends State<ExpensesHistoryWidget> {
     );
   }
 
-  Widget _buildHistorySection() {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: expenses.length,
-      itemBuilder: (context, index) {
-        return _buildExpenseCard(expenses[index]);
-      },
-    );
-  }
-
-  Widget _buildExpenseCard(Map<String, dynamic> expense) {
-    final l10n = AppLocalizations.of(context)!;
+  Widget _buildExpenseCard(DocumentSnapshot document, AppLocalizations l10n) {
+    Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+    final date = data['date'] as Timestamp?;
+    
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       elevation: 0,
@@ -171,7 +111,7 @@ class _ExpensesHistoryWidgetState extends State<ExpensesHistoryWidget> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    expense['description'],
+                    data['description'] ?? '',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -180,7 +120,7 @@ class _ExpensesHistoryWidgetState extends State<ExpensesHistoryWidget> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${l10n.date}: ${DateFormat('MMM d, y').format(expense['date'])}',
+                    '${l10n.date}: ${date != null ? DateFormat('MMM d, y').format(date.toDate()) : ''}',
                     style: const TextStyle(
                       fontSize: 14,
                       color: Colors.grey,
@@ -192,7 +132,7 @@ class _ExpensesHistoryWidgetState extends State<ExpensesHistoryWidget> {
             Row(
               children: [
                 Text(
-                  expense['amount'],
+                  data['amount'] ?? '',
                   style: const TextStyle(
                     fontSize: 16,
                     color: Colors.grey,
@@ -200,7 +140,7 @@ class _ExpensesHistoryWidgetState extends State<ExpensesHistoryWidget> {
                 ),
                 IconButton(
                   icon: const Icon(Icons.close, color: Colors.red),
-                  onPressed: () => _confirmDelete(expense['id']),
+                  onPressed: () => _confirmDelete(document.id, l10n),
                 ),
               ],
             ),
@@ -210,8 +150,7 @@ class _ExpensesHistoryWidgetState extends State<ExpensesHistoryWidget> {
     );
   }
 
-  Widget _buildEmptyState() {
-    final l10n = AppLocalizations.of(context)!;
+  Widget _buildEmptyState(AppLocalizations l10n) {
     return Center(
       child: Text(
         l10n.noExpenses,
@@ -223,18 +162,21 @@ class _ExpensesHistoryWidgetState extends State<ExpensesHistoryWidget> {
     );
   }
 
-  Widget _buildAddButton() {
-    final l10n = AppLocalizations.of(context)!;
+  Widget _buildAddButton(AppLocalizations l10n) {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: ElevatedButton(
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          final result = await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => ExpensesWidget(petId: widget.petId),
             ),
-          ).then((_) => _fetchExpenses());
+          );
+          
+          if (result == true && mounted) {
+            _initExpensesStream();
+          }
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFFEADDFF),
@@ -245,6 +187,41 @@ class _ExpensesHistoryWidgetState extends State<ExpensesHistoryWidget> {
           ),
         ),
         child: Text(l10n.add, style: const TextStyle(fontSize: 16)),
+      ),
+    );
+  }
+
+  Future<void> _deleteExpense(String expenseId, AppLocalizations l10n) async {
+    try {
+      await FirebaseFirestore.instance.collection('expenses').doc(expenseId).delete();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${l10n.error}: $e')),
+        );
+      }
+    }
+  }
+
+  void _confirmDelete(String expenseId, AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.delete),
+        content: Text(l10n.confirm),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _deleteExpense(expenseId, l10n);
+            },
+            child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
+          ),
+        ],
       ),
     );
   }

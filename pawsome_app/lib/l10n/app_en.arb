@@ -118,5 +118,14 @@
     "noPetSelected": "Error: No pet selected",
     "selectActivityAndDuration": "Please select both activity type and duration",
     "activitySaved": "Activity information saved successfully",
-    "errorSavingActivity": "Error saving activity information: {error}"
+    "errorSavingActivity": "Error saving activity information: {error}",
+    "foodNutrition": "Food - Nutrition",
+    "groomingHygiene": "Grooming - Hygiene",
+    "supplies": "Supplies",
+    "healthcare": "Healthcare",
+    "toysAccessories": "Toys - Accessories",
+    "expenseSaved": "Expense saved successfully",
+    "errorSavingExpense": "Error saving expense: {error}",
+    "appointmentSaved": "Appointment saved successfully",
+    "errorSavingAppointment": "Error saving appointment: {error}"
 } 

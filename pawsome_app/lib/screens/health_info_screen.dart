@@ -120,8 +120,8 @@ class _HealthInfoWidgetState extends State<HealthInfoWidget> {
         final DateTime? picked = await showDatePicker(
           context: context,
           initialDate: selectedDate ?? DateTime.now(),
-          firstDate: DateTime.now(),
-          lastDate: DateTime(2025),
+          firstDate: DateTime(2000),
+          lastDate: DateTime.now().add(const Duration(days: 365 * 5)),
         );
         if (picked != null) {
           onDateSelected(picked);

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pawsome_app/screens/expenses_history_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ExpensesWidget extends StatefulWidget {
   final String? petId;
@@ -20,31 +21,32 @@ class _ExpensesWidgetState extends State<ExpensesWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(),
+            _buildHeader(l10n),
             const Divider(color: Color(0xFFCAC4D0)),
-            _buildCategoriesSection(),
+            _buildCategoriesSection(l10n),
             const Divider(color: Color(0xFFCAC4D0)),
-            _buildPriceInput(),
+            _buildPriceInput(l10n),
             const Spacer(),
-            _buildSaveButton()
+            _buildSaveButton(l10n)
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16),
-      child: const Text(
-        'Expenses',
+      child: Text(
+        l10n.expenses,
         textAlign: TextAlign.center,
-        style: TextStyle(
+        style: const TextStyle(
           fontFamily: 'Roboto',
           fontSize: 22,
           fontWeight: FontWeight.w500,
@@ -54,14 +56,14 @@ class _ExpensesWidgetState extends State<ExpensesWidget> {
     );
   }
 
-  Widget _buildCategoriesSection() {
+  Widget _buildCategoriesSection(AppLocalizations l10n) {
     return Column(
       children: [
-        const Padding(
-          padding: EdgeInsets.all(16),
+        Padding(
+          padding: const EdgeInsets.all(16),
           child: Text(
-            'Categories',
-            style: TextStyle(
+            l10n.category,
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Color(0xFF65558F),
@@ -74,12 +76,12 @@ class _ExpensesWidgetState extends State<ExpensesWidget> {
           spacing: 8,
           runSpacing: 8,
           children: [
-            _buildCategoryChip('Food - Nutrition'),
-            _buildCategoryChip('Grooming - Hygiene'),
-            _buildCategoryChip('Supplies'),
-            _buildCategoryChip('Healthcare'),
-            _buildCategoryChip('Toys - Accessories'),
-            _buildCategoryChip('Other'),
+            _buildCategoryChip(l10n.foodNutrition),
+            _buildCategoryChip(l10n.groomingHygiene),
+            _buildCategoryChip(l10n.supplies),
+            _buildCategoryChip(l10n.healthcare),
+            _buildCategoryChip(l10n.toysAccessories),
+            _buildCategoryChip(l10n.other),
           ],
         ),
       ],
@@ -99,14 +101,14 @@ class _ExpensesWidgetState extends State<ExpensesWidget> {
     );
   }
 
-  Widget _buildPriceInput() {
+  Widget _buildPriceInput(AppLocalizations l10n) {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: TextField(
         controller: _priceController,
-        decoration: const InputDecoration(
-          labelText: 'Price',
-          border: OutlineInputBorder(),
+        decoration: InputDecoration(
+          labelText: l10n.cost,
+          border: const OutlineInputBorder(),
         ),
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         inputFormatters: [
@@ -116,11 +118,11 @@ class _ExpensesWidgetState extends State<ExpensesWidget> {
     );
   }
 
-  Widget _buildSaveButton() {
+  Widget _buildSaveButton(AppLocalizations l10n) {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: ElevatedButton(
-        onPressed: _saveExpense,
+        onPressed: () => _saveExpense(l10n),
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFFEADDFF),
           foregroundColor: const Color(0xFF65558F),
@@ -129,22 +131,22 @@ class _ExpensesWidgetState extends State<ExpensesWidget> {
             borderRadius: BorderRadius.circular(30),
           ),
         ),
-        child: const Text('Save', style: TextStyle(fontSize: 16)),
+        child: Text(l10n.save, style: const TextStyle(fontSize: 16)),
       ),
     );
   }
 
-  void _saveExpense() async {
+  void _saveExpense(AppLocalizations l10n) async {
     if (widget.petId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error: No pet selected')),
+        SnackBar(content: Text(l10n.noPetSelected)),
       );
       return;
     }
 
     if (selectedCategory.isEmpty || _priceController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in all fields')),
+        SnackBar(content: Text(l10n.fillAllFields)),
       );
       return;
     }
@@ -153,7 +155,7 @@ class _ExpensesWidgetState extends State<ExpensesWidget> {
       String? userId = FirebaseAuth.instance.currentUser?.uid;
       if (userId == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error: User not logged in')),
+          SnackBar(content: Text(l10n.userNotLoggedIn)),
         );
         return;
       }
@@ -167,7 +169,7 @@ class _ExpensesWidgetState extends State<ExpensesWidget> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Expense saved successfully')),
+        SnackBar(content: Text(l10n.expenseSaved)),
       );
 
       Navigator.pushReplacement(
@@ -178,7 +180,7 @@ class _ExpensesWidgetState extends State<ExpensesWidget> {
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error saving expense: $e')),
+        SnackBar(content: Text(l10n.errorSavingExpense(e.toString()))),
       );
     }
   }

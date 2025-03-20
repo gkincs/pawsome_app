@@ -60,27 +60,33 @@ class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeader(),
-            const Divider(color: Color(0xFFCAC4D0)),
-            Expanded(
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : activities.isEmpty
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return Column(
+              children: [
+                _buildHeader(l10n),
+                const Divider(color: Color(0xFFCAC4D0)),
+                Expanded(
+                  child: activities.isEmpty
                       ? _buildEmptyState()
-                      : _buildActivitySection(),
-            ),
-            _buildAddButton(),
-          ],
+                      : ListView.builder(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: activities.length,
+                          itemBuilder: (context, index) {
+                            return _buildActivityCard(activities[index], l10n);
+                          },
+                        ),
+                ),
+                _buildAddButton(),
+              ],
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
-    final l10n = AppLocalizations.of(context)!;
+  Widget _buildHeader(AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.all(16),
       child: Text(
@@ -96,60 +102,80 @@ class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
     );
   }
 
-  Widget _buildActivitySection() {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: activities.length,
-      itemBuilder: (context, index) {
-        return _buildActivityCard(activities[index]);
+  Widget _buildActivityCard(Map<String, dynamic> activity, AppLocalizations l10n) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      elevation: 4,
+      shadowColor: Colors.black.withOpacity(0.1),
+      child: ListTile(
+        title: Text(activity['activityType'].toString().capitalize()),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('${l10n.duration}: ${activity['duration']} minutes'),
+            Text('${l10n.date}: ${DateFormat('yyyy-MM-dd').format(activity['date'])}'),
+          ],
+        ),
+        trailing: IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: () => _showDeleteConfirmation(activity['activityType'], l10n),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showDeleteConfirmation(String activityType, AppLocalizations l10n) async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(l10n.deleteEntry),
+          content: Text(l10n.confirmDelete),
+          actions: <Widget>[
+            TextButton(
+              child: Text(l10n.cancel),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text(l10n.delete),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await _deleteActivity(activityType, l10n);
+              },
+            ),
+          ],
+        );
       },
     );
   }
 
-  Widget _buildActivityCard(Map<String, dynamic> activity) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-        side: const BorderSide(
-          color: Color(0xFFEADDFF),
-          width: 1,
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              activity['activityType'].toString().capitalize(),
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: Color(0xFF65558F),
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Duration: ${activity['duration']} minutes',
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Date: ${DateFormat('MMM d, y HH:mm').format(activity['date'])}',
-              style: const TextStyle(
-                fontSize: 12,
-                color: Colors.grey,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+  Future<void> _deleteActivity(String activityType, AppLocalizations l10n) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('activityLogs')
+          .where('activityType', isEqualTo: activityType)
+          .get()
+          .then((snapshot) {
+        for (DocumentSnapshot doc in snapshot.docs) {
+          doc.reference.delete();
+        }
+      });
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.deleteEntry)),
+        );
+        _fetchActivities();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${l10n.error}: $e')),
+        );
+      }
+    }
   }
 
   Widget _buildEmptyState() {

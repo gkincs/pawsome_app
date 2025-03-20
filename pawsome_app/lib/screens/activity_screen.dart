@@ -67,9 +67,9 @@ Widget _buildHeader() {
   Widget _buildActivityTypeSection() {
     final l10n = AppLocalizations.of(context)!;
     final List<String> activityTypes = [
-      'Walk',
-      'Play',
-      'Training',
+      l10n.walk,
+      l10n.play,
+      l10n.training,
       l10n.other
     ];
     return Column(
@@ -110,10 +110,10 @@ Widget _buildHeader() {
   Widget _buildDurationSection() {
     final l10n = AppLocalizations.of(context)!;
     final List<String> durations = [
-      '< 30 min',
-      '30 min',
-      '1 hour',
-      '1+ hour'
+      l10n.lessThan30Min,
+      l10n.thirtyMin,
+      l10n.oneHour,
+      l10n.moreThanOneHour
     ];
     return Column(
       children: [
@@ -170,14 +170,14 @@ Widget _buildHeader() {
     final l10n = AppLocalizations.of(context)!;
     if (widget.petId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: No pet selected')),
+        SnackBar(content: Text(l10n.noPetSelected)),
       );
       return;
     }
 
     if (selectedActivityType == null || selectedDuration == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please select both activity type and duration')),
+        SnackBar(content: Text(l10n.selectActivityAndDuration)),
       );
       return;
     }
@@ -191,7 +191,7 @@ Widget _buildHeader() {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Activity information saved successfully')),
+        SnackBar(content: Text(l10n.activitySaved)),
       );
 
       // Navigate back to ActivityHistoryWidget
@@ -203,23 +203,17 @@ Widget _buildHeader() {
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error saving activity information: $e')),
+        SnackBar(content: Text(l10n.errorSavingActivity(e.toString()))),
       );
     }
   }
 
   int _parseDuration(String duration) {
-    switch (duration) {
-      case '< 30 min':
-        return 15;
-      case '30 min':
-        return 30;
-      case '1 hour':
-        return 60;
-      case '1+ hour':
-        return 90;
-      default:
-        return 0;
-    }
+    final l10n = AppLocalizations.of(context)!;
+    if (duration == l10n.lessThan30Min) return 15;
+    if (duration == l10n.thirtyMin) return 30;
+    if (duration == l10n.oneHour) return 60;
+    if (duration == l10n.moreThanOneHour) return 90;
+    return 0;
   }
 }

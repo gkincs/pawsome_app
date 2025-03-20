@@ -36,9 +36,8 @@ class _MedicationHistoryWidgetState extends State<MedicationHistoryWidget> {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(),
+            _buildHeader(l10n),
             const Divider(color: Color(0xFFCAC4D0)),
             Expanded(
               child: StreamBuilder<QuerySnapshot>(
@@ -48,24 +47,29 @@ class _MedicationHistoryWidgetState extends State<MedicationHistoryWidget> {
                     return const Center(child: CircularProgressIndicator());
                   }
                   if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
+                    return Center(child: Text('${l10n.error}: ${snapshot.error}'));
                   }
                   if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return _buildEmptyState();
+                    return _buildEmptyState(l10n);
                   }
-                  return _buildMedicationSection(snapshot.data!.docs);
+                  return ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: (context, index) {
+                      return _buildMedicationCard(snapshot.data!.docs[index], l10n);
+                    },
+                  );
                 },
               ),
             ),
-            _buildAddButton(),
+            _buildAddButton(l10n),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
-    final l10n = AppLocalizations.of(context)!;
+  Widget _buildHeader(AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.all(16),
       width: double.infinity,
@@ -82,19 +86,8 @@ class _MedicationHistoryWidgetState extends State<MedicationHistoryWidget> {
     );
   }
 
-  Widget _buildMedicationSection(List<QueryDocumentSnapshot> documents) {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: documents.length,
-      itemBuilder: (context, index) {
-        Map<String, dynamic> data = documents[index].data() as Map<String, dynamic>;
-        return _buildMedicationCard(data);
-      },
-    );
-  }
-
-  Widget _buildMedicationCard(Map<String, dynamic> medication) {
-    final l10n = AppLocalizations.of(context)!;
+  Widget _buildMedicationCard(QueryDocumentSnapshot document, AppLocalizations l10n) {
+    Map<String, dynamic> data = document.data() as Map<String, dynamic>;
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       elevation: 0,
@@ -107,24 +100,35 @@ class _MedicationHistoryWidgetState extends State<MedicationHistoryWidget> {
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              medication['medicationName'],
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: Color(0xFF65558F),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    data['medicationName'] ?? '',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF65558F),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${l10n.dosage}: ${data['dosage'] ?? ''}',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 4),
-            Text(
-              '${l10n.dosage}: ${medication['dosage']}',
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-              ),
+            IconButton(
+              icon: const Icon(Icons.close, color: Colors.red),
+              onPressed: () => _confirmDelete(document.id, l10n),
             ),
           ],
         ),
@@ -132,8 +136,42 @@ class _MedicationHistoryWidgetState extends State<MedicationHistoryWidget> {
     );
   }
 
-  Widget _buildEmptyState() {
-    final l10n = AppLocalizations.of(context)!;
+  Future<void> _deleteMedication(String medicationId, AppLocalizations l10n) async {
+    try {
+      await FirebaseFirestore.instance.collection('medications').doc(medicationId).delete();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${l10n.error}: $e')),
+        );
+      }
+    }
+  }
+
+  void _confirmDelete(String medicationId, AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.deleteEntry),
+        content: Text(l10n.confirmDelete),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _deleteMedication(medicationId, l10n);
+            },
+            child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(AppLocalizations l10n) {
     return Center(
       child: Text(
         l10n.noMedications,
@@ -145,18 +183,21 @@ class _MedicationHistoryWidgetState extends State<MedicationHistoryWidget> {
     );
   }
 
-  Widget _buildAddButton() {
-    final l10n = AppLocalizations.of(context)!;
+  Widget _buildAddButton(AppLocalizations l10n) {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: ElevatedButton(
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          final result = await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => HealthInfoWidget(petId: widget.petId),
             ),
           );
+          
+          if (result == true && mounted) {
+            _initMedicationsStream();
+          }
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFFEADDFF),

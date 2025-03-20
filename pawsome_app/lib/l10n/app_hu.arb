@@ -50,7 +50,7 @@
     "endDate": "Befejező dátum",
     "addAppointment": "Időpont hozzáadása",
     "appointmentType": "Időpont típusa",
-    "veterinarian": "Állatorvos",
+    "veterinarian": "Hely/Orvos",
     "location": "Helyszín",
     "addExpense": "Kiadás hozzáadása",
     "expenseType": "Kiadás típusa",
@@ -118,5 +118,14 @@
     "noPetSelected": "Hiba: Nincs kiválasztva kisállat",
     "selectActivityAndDuration": "Kérlek válassz tevékenység típust és időtartamot",
     "activitySaved": "A tevékenység információ sikeresen mentve",
-    "errorSavingActivity": "Hiba a tevékenység információ mentésekor: {error}"
+    "errorSavingActivity": "Hiba a tevékenység információ mentésekor: {error}",
+    "foodNutrition": "Étel - Táplálkozás",
+    "groomingHygiene": "Ápolás - Higiénia",
+    "supplies": "Kellékek",
+    "healthcare": "Egészségügy",
+    "toysAccessories": "Játékok - Kiegészítők",
+    "expenseSaved": "A kiadás sikeresen mentve",
+    "errorSavingExpense": "Hiba a kiadás mentésekor: {error}",
+    "appointmentSaved": "Az időpont sikeresen mentve",
+    "errorSavingAppointment": "Hiba az időpont mentésekor: {error}"
 } 
