@@ -67,6 +67,7 @@
     "selectDate": "Select Date",
     "selectTime": "Select Time",
     "noActivities": "No activities yet",
+    "noActivitiesAdded": "No more activities added yet!",
     "noNutrition": "No nutrition entries yet",
     "noMedications": "No medications yet",
     "noAppointments": "No appointments yet",

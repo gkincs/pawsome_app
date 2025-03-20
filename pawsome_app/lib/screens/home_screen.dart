@@ -294,8 +294,8 @@ class _HomeWidgetState extends State<HomeWidget> {
           children: [
             _buildHeader(l10n),
             const Divider(color: Color(0xFFCAC4D0)),
-            _buildPetsSection(l10n),
             _buildNavigationButtons(),
+            _buildPetsSection(l10n),
             const SizedBox(height: 16),
             _buildRecentActivitiesSection(l10n),
             const SizedBox(height: 32),
@@ -309,7 +309,7 @@ class _HomeWidgetState extends State<HomeWidget> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Align(
-        alignment: Alignment.topCenter,
+        alignment: Alignment.center,
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -458,7 +458,7 @@ class _HomeWidgetState extends State<HomeWidget> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
                 l10n.recentActivities,
@@ -488,11 +488,17 @@ class _HomeWidgetState extends State<HomeWidget> {
     List<RecentActivity> activities = List.from(recentActivities);
               
     if (activities.isEmpty) {
-      return Center(child: Text(l10n.noActivities));
+      return Column(
+        children: [
+          _buildEmptyActivityCard(l10n),
+          const SizedBox(height: 8),
+          _buildEmptyActivityCard(l10n),
+        ],
+      );
     }
 
-    // Ha nincs aktivitás, üres kártyák
-    while (activities.length < 2) {
+    // Ha csak 1 aktivitás van, adjunk hozzá egy üres kártyát
+    if (activities.length == 1) {
       activities.add(RecentActivity(
         petId: '',
         petName: '',
@@ -505,7 +511,7 @@ class _HomeWidgetState extends State<HomeWidget> {
     return Column(
       children: activities.map((activity) {
         if (activity.type == 'empty') {
-          return const SizedBox.shrink();
+          return _buildEmptyActivityCard(l10n);
         }
 
         String formattedDate = _formatDate(activity.date, l10n);
@@ -513,12 +519,31 @@ class _HomeWidgetState extends State<HomeWidget> {
 
         return Card(
           margin: const EdgeInsets.only(bottom: 8),
+          elevation: 4,
+          shadowColor: Colors.black.withOpacity(0.1),
           child: ListTile(
             title: Text('${activity.petName} - $activityTitle'),
             subtitle: Text('${activity.description}\n$formattedDate'),
           ),
         );
       }).toList(),
+    );
+  }
+
+  Widget _buildEmptyActivityCard(AppLocalizations l10n) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      elevation: 4,
+      shadowColor: Colors.black.withOpacity(0.1),
+      child: ListTile(
+        title: Text(
+          l10n.noActivitiesAdded,
+          style: const TextStyle(
+            color: Colors.grey,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+      ),
     );
   }
 
