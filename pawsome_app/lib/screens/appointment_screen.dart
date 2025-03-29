@@ -220,12 +220,7 @@ class _AppointmentWidgetState extends State<AppointmentWidget> {
         SnackBar(content: Text(l10n.appointmentSaved)),
       );
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => AppointmentHistoryWidget(petId: widget.petId),
-        ),
-      );
+      Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.errorSavingAppointment(e.toString()))),
