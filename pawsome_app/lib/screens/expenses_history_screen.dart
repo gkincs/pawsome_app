@@ -167,16 +167,13 @@ class _ExpensesHistoryWidgetState extends State<ExpensesHistoryWidget> {
       padding: const EdgeInsets.all(16),
       child: ElevatedButton(
         onPressed: () async {
-          final result = await Navigator.push(
+          await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => ExpensesWidget(petId: widget.petId),
             ),
           );
-          
-          if (result == true && mounted) {
-            _initExpensesStream();
-          }
+          // A lista automatikusan frissül a StreamBuilder miatt
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFFEADDFF),

@@ -172,12 +172,7 @@ class _ExpensesWidgetState extends State<ExpensesWidget> {
         SnackBar(content: Text(l10n.expenseSaved)),
       );
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ExpensesHistoryWidget(petId: widget.petId!),
-        ),
-      );
+      Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.errorSavingExpense(e.toString()))),
