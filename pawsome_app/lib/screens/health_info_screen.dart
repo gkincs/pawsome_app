@@ -191,12 +191,7 @@ class _HealthInfoWidgetState extends State<HealthInfoWidget> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(l10n.medicationSaved)),
         );
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MedicationHistoryWidget(petId: widget.petId),
-          ),
-        );
+        Navigator.pop(context);
       }
     } catch (e) {
       if (mounted) {

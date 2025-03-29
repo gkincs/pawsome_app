@@ -183,13 +183,14 @@ class _NutritionHistoryWidgetState extends State<NutritionHistoryWidget> {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: ElevatedButton(
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => NutritionDiaryWidget(petId: widget.petId),
             ),
           );
+          // A lista automatikusan frissül a StreamBuilder miatt
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFFEADDFF),

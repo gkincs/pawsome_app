@@ -227,12 +227,7 @@ class _NutritionDiaryWidgetState extends State<NutritionDiaryWidget> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(l10n.feedingSaved)),
         );
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => NutritionHistoryWidget(petId: widget.petId),
-          ),
-        );
+        Navigator.pop(context);
       }
     } catch (e) {
       if (mounted) {
