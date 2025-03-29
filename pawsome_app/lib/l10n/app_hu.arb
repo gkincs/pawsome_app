@@ -127,5 +127,9 @@
     "expenseSaved": "A kiadás sikeresen mentve",
     "errorSavingExpense": "Hiba a kiadás mentésekor: {error}",
     "appointmentSaved": "Az időpont sikeresen mentve",
-    "errorSavingAppointment": "Hiba az időpont mentésekor: {error}"
+    "errorSavingAppointment": "Hiba az időpont mentésekor: {error}",
+    "deletePet": "Kisállat törlése",
+    "deletePetConfirmation": "Biztosan törölni szeretnéd",
+    "petDeleted": "A kisállat sikeresen törölve",
+    "failedToDelete": "Nem sikerült törölni a kisállatot: {error}"
 } 

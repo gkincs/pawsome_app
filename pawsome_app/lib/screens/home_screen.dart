@@ -54,7 +54,7 @@ class _HomeWidgetState extends State<HomeWidget> {
   bool isLoading = false;
   String? userId;
   int currentPage = 0;
-  int petsPerPage = 3;
+  int petsPerPage = 2;
   List<RecentActivity> recentActivities = [];
 
   @override

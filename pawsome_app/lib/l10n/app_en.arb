@@ -127,5 +127,9 @@
     "expenseSaved": "Expense saved successfully",
     "errorSavingExpense": "Error saving expense: {error}",
     "appointmentSaved": "Appointment saved successfully",
-    "errorSavingAppointment": "Error saving appointment: {error}"
+    "errorSavingAppointment": "Error saving appointment: {error}",
+    "deletePet": "Delete Pet",
+    "deletePetConfirmation": "Are you sure you want to delete",
+    "petDeleted": "Pet deleted successfully",
+    "failedToDelete": "Failed to delete pet: {error}"
 } 

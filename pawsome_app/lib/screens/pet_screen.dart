@@ -106,16 +106,47 @@ class _PetScreenWidgetState extends State<PetScreenWidget> {
         return Card(
           margin: const EdgeInsets.only(bottom: 16),
           child: ListTile(
+            leading: _buildPetAvatar(pet),
             title: Text(pet['name']),
             subtitle: Text(pet['breed']),
-            trailing: IconButton(
-              icon: const Icon(Icons.edit),
-              onPressed: () => _navigateToPetProfile(pet['petId']),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.edit, size: 20),
+                  onPressed: () => _navigateToPetProfile(pet['petId']),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close, size: 20, color: Colors.red),
+                  onPressed: () => _showDeleteConfirmation(pet['petId'], pet['name'], l10n),
+                ),
+              ],
             ),
           ),
         );
       },
     );
+  }
+
+  Widget _buildPetAvatar(Map<String, dynamic> pet) {
+    if (pet['profileImageUrl'] != null && pet['profileImageUrl'].isNotEmpty) {
+      return CircleAvatar(
+        backgroundImage: NetworkImage(pet['profileImageUrl']),
+        radius: 20,
+      );
+    } else {
+      return CircleAvatar(
+        backgroundColor: const Color(0xFFEADDFF),
+        radius: 20,
+        child: Text(
+          pet['name'][0].toUpperCase(),
+          style: const TextStyle(
+            color: Color(0xFF65558F),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      );
+    }
   }
 
   Widget _buildEmptyState(AppLocalizations l10n) {
@@ -166,5 +197,44 @@ class _PetScreenWidgetState extends State<PetScreenWidget> {
         builder: (context) => PetProfileWidget(petId: petId),
       ),
     ).then((_) => _fetchPets());
+  }
+
+  Future<void> _showDeleteConfirmation(String petId, String petName, AppLocalizations l10n) async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(l10n.deletePet),
+          content: Text('${l10n.deletePetConfirmation} $petName?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(l10n.cancel),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await _deletePet(petId, l10n);
+              },
+              child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _deletePet(String petId, AppLocalizations l10n) async {
+    try {
+      await FirebaseFirestore.instance.collection('pets').doc(petId).delete();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.petDeleted)),
+      );
+      _fetchPets(); // Frissítjük a listát
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.failedToDelete(e.toString()))),
+      );
+    }
   }
 }

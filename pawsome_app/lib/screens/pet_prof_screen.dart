@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class PetProfileWidget extends StatefulWidget {
   final String? petId;
@@ -113,7 +114,12 @@ class _PetProfileWidgetState extends State<PetProfileWidget> {
 
   Future<void> _pickImage() async {
     if (!_isEditing) return;
-    final XFile? selectedImage = await _picker.pickImage(source: ImageSource.gallery);
+    final XFile? selectedImage = await _picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 800,
+      maxHeight: 800,
+      imageQuality: 85,
+    );
     if (selectedImage != null) {
       setState(() {
         _image = selectedImage;
@@ -138,16 +144,29 @@ class _PetProfileWidgetState extends State<PetProfileWidget> {
       return;
     }
 
-    final Map<String, dynamic> petData = {
-      'name': name,
-      'animalType': _selectedSpecies,
-      'breed': _selectedBreed,
-      'age': DateTime.now().year - _selectedDate!.year,
-      'gender': _isFemale ? l10n.female : l10n.male,
-      'userId': _userId,
-    };
-
     try {
+      String? profileImageUrl;
+      if (_image != null) {
+        // Kép feltöltése a Storage-ba
+        final storageRef = FirebaseStorage.instance
+            .ref()
+            .child('pet_images')
+            .child('${_userId}_${DateTime.now().millisecondsSinceEpoch}.jpg');
+        
+        await storageRef.putFile(File(_image!.path));
+        profileImageUrl = await storageRef.getDownloadURL();
+      }
+
+      final Map<String, dynamic> petData = {
+        'name': name,
+        'animalType': _selectedSpecies,
+        'breed': _selectedBreed,
+        'age': DateTime.now().year - _selectedDate!.year,
+        'gender': _isFemale ? l10n.female : l10n.male,
+        'userId': _userId,
+        if (profileImageUrl != null) 'profileImageUrl': profileImageUrl,
+      };
+
       if (widget.petId != null) {
         await FirebaseFirestore.instance.collection('pets').doc(widget.petId).update(petData);
       } else {
