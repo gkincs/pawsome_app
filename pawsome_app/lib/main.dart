@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pawsome_app/bloc/auth_bloc.dart';
@@ -41,6 +42,13 @@ class Pawsome extends StatelessWidget {
               theme: ThemeData(
                 colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF65558F)),
                 useMaterial3: true,
+                appBarTheme: const AppBarTheme(
+                  systemOverlayStyle: SystemUiOverlayStyle(
+                    statusBarColor: Colors.transparent,
+                    statusBarIconBrightness: Brightness.dark,
+                    statusBarBrightness: Brightness.light,
+                  ),
+                ),
               ),
               locale: languageService.currentLocale,
               localizationsDelegates: const [

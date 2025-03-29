@@ -289,6 +289,10 @@ class _HomeWidgetState extends State<HomeWidget> {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       body: SafeArea(
+        top: true,
+        bottom: true,
+        left: true,
+        right: true,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -348,15 +352,17 @@ class _HomeWidgetState extends State<HomeWidget> {
   Widget _buildPetCard(Pet pet) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
-      elevation: 0,
+      elevation: 4,
+      shadowColor: const Color(0xFF65558F).withOpacity(0.2),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         side: const BorderSide(
           color: Color(0xFFEADDFF),
           width: 1,
         ),
       ),
       child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         leading: _buildPetAvatar(pet),
         title: Text(
           pet.name,
@@ -414,21 +420,23 @@ class _HomeWidgetState extends State<HomeWidget> {
   Widget _buildHeader(AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.all(16),
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        color: Color(0xFFEADDFF),
+      ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {},
-            color: const Color(0xFF65558F),
-          ),
+          const SizedBox(width: 40), // Egyenlő térköz a jobb oldali ikon miatt
           Expanded(
-            child: Text(
-              l10n.appTitle,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w500,
-                color: Colors.black,
+            child: Center(
+              child: Text(
+                l10n.appTitle,
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF65558F),
+                ),
               ),
             ),
           ),
@@ -474,7 +482,15 @@ class _HomeWidgetState extends State<HomeWidget> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          Container(
+            width: double.infinity,
+            height: 2,
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: const BoxDecoration(
+              color: Color(0xFFEADDFF),
+              borderRadius: BorderRadius.all(Radius.circular(1)),
+            ),
+          ),
           if (isLoading)
             const Center(child: CircularProgressIndicator())
           else
@@ -519,10 +535,29 @@ class _HomeWidgetState extends State<HomeWidget> {
 
         return Card(
           margin: const EdgeInsets.only(bottom: 8),
-          elevation: 4,
-          shadowColor: Colors.black.withOpacity(0.1),
+          elevation: 2,
+          shadowColor: const Color(0xFF65558F).withOpacity(0.1),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+            side: const BorderSide(
+              color: Color(0xFFF3E8FD),
+              width: 1,
+            ),
+          ),
           child: ListTile(
-            title: Text('${activity.petName} - $activityTitle'),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            title: RichText(
+              text: TextSpan(
+                style: const TextStyle(
+                  color: Color(0xFF65558F),
+                  fontWeight: FontWeight.w500,
+                ),
+                children: [
+                  TextSpan(text: '${activity.petName} - '),
+                  TextSpan(text: activityTitle),
+                ],
+              ),
+            ),
             subtitle: Text('${activity.description}\n$formattedDate'),
           ),
         );
@@ -533,9 +568,17 @@ class _HomeWidgetState extends State<HomeWidget> {
   Widget _buildEmptyActivityCard(AppLocalizations l10n) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
-      elevation: 4,
-      shadowColor: Colors.black.withOpacity(0.1),
+      elevation: 2,
+      shadowColor: const Color(0xFF65558F).withOpacity(0.1),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+        side: const BorderSide(
+          color: Color(0xFFF3E8FD),
+          width: 1,
+        ),
+      ),
       child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         title: Text(
           l10n.noActivitiesAdded,
           style: const TextStyle(
