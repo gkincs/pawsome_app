@@ -38,6 +38,8 @@ class CheckFirstLoginEvent extends AuthEvent {
 
 class LogoutEvent extends AuthEvent {}
 
+class CheckAuthStatus extends AuthEvent {}
+
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final UserRepository _userRepository;
 
@@ -45,6 +47,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<LoginEvent>(_onLogin);
     on<LogoutEvent>(_onLogout);
     on<CheckFirstLoginEvent>(_onCheckFirstLogin);
+    on<CheckAuthStatus>(_onCheckAuthStatus);
   }
 
   Future<void> _onLogin(LoginEvent event, Emitter<AuthState> emit) async {
@@ -76,6 +79,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       await _userRepository.signOut();
       emit(AuthState());
+    } catch (e) {
+      emit(AuthState(errorMessage: e.toString()));
+    }
+  }
+
+  Future<void> _onCheckAuthStatus(CheckAuthStatus event, Emitter<AuthState> emit) async {
+    try {
+      User? currentUser = _userRepository.getCurrentUser();
+      if (currentUser != null) {
+        bool isFirstLogin = await _userRepository.isFirstLogin(currentUser.uid);
+        emit(AuthState(user: currentUser, isFirstLogin: isFirstLogin));
+      } else {
+        emit(AuthState());
+      }
     } catch (e) {
       emit(AuthState(errorMessage: e.toString()));
     }

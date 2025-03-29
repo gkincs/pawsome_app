@@ -19,8 +19,37 @@ void main() async {
   runApp(const Pawsome());
 }
 
-class Pawsome extends StatelessWidget {
+class Pawsome extends StatefulWidget {
   const Pawsome({super.key});
+
+  @override
+  State<Pawsome> createState() => _PawsomeState();
+}
+
+class _PawsomeState extends State<Pawsome> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // Amikor az alkalmazás visszatér a háttérből
+      final authBloc = context.read<AuthBloc>();
+      if (authBloc.state.user != null) {
+        // Ha a felhasználó be van jelentkezve, frissítjük az állapotot
+        authBloc.add(CheckAuthStatus());
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
