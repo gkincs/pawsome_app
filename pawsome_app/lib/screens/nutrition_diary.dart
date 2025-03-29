@@ -217,7 +217,7 @@ class _NutritionDiaryWidgetState extends State<NutritionDiaryWidget> {
 
     try {
       await FirebaseFirestore.instance.collection('feedingLogs').add({
-        'petId': FirebaseFirestore.instance.doc('pets/${widget.petId}'),
+        'petId': widget.petId,
         'foodType': selectedFoodType,
         'amount': selectedAmount,
         'date': Timestamp.fromDate(selectedDate),

@@ -171,10 +171,11 @@ class _HomeWidgetState extends State<HomeWidget> {
 
       for (var doc in appointmentsQuery.docs) {
         var data = doc.data();
-        if (data['date'] != null && data['petRef'] != null) {
+        String petRef = data['petRef'] as String;
+        if (data['date'] != null && petRef != null) {
           allActivities.add(RecentActivity(
-            petId: data['petRef'],
-            petName: petNames[data['petRef']] ?? 'Unknown Pet',
+            petId: petRef,
+            petName: petNames[petRef] ?? 'Unknown Pet',
             type: 'appointment',
             description: data['purpose'] ?? 'No purpose specified',
             date: (data['date'] as Timestamp).toDate(),
@@ -190,10 +191,11 @@ class _HomeWidgetState extends State<HomeWidget> {
 
       for (var doc in expensesQuery.docs) {
         var data = doc.data();
-        if (data['date'] != null && data['petId'] != null) {
+        String petId = data['petId'] as String;
+        if (data['date'] != null && petId != null) {
           allActivities.add(RecentActivity(
-            petId: data['petId'],
-            petName: petNames[data['petId']] ?? 'Unknown Pet',
+            petId: petId,
+            petName: petNames[petId] ?? 'Unknown Pet',
             type: 'expense',
             description: '${data['description']} - ${data['amount']}',
             date: (data['date'] as Timestamp).toDate(),
@@ -204,15 +206,20 @@ class _HomeWidgetState extends State<HomeWidget> {
       // Etetések lekérése
       var feedingQuery = await FirebaseFirestore.instance
           .collection('feedingLogs')
-          .where('petRef', whereIn: petIds)
+          .where('petId', whereIn: petIds)
           .get();
+
+      print('Found ${feedingQuery.docs.length} feeding logs'); // Debug print
 
       for (var doc in feedingQuery.docs) {
         var data = doc.data();
-        if (data['date'] != null && data['petRef'] != null) {
+        print('Feeding log data: $data'); // Debug print
+        String petId = data['petId'] as String;
+        if (data['date'] != null && petId != null) {
+          print('Adding feeding activity for pet: $petId'); // Debug print
           allActivities.add(RecentActivity(
-            petId: data['petRef'],
-            petName: petNames[data['petRef']] ?? 'Unknown Pet',
+            petId: petId,
+            petName: petNames[petId] ?? 'Unknown Pet',
             type: 'feeding',
             description: '${data['foodType']} - ${data['amount']}',
             date: (data['date'] as Timestamp).toDate(),
@@ -228,10 +235,11 @@ class _HomeWidgetState extends State<HomeWidget> {
 
       for (var doc in activityQuery.docs) {
         var data = doc.data();
-        if (data['date'] != null && data['petId'] != null) {
+        String petId = data['petId'] as String;
+        if (data['date'] != null && petId != null) {
           allActivities.add(RecentActivity(
-            petId: data['petId'],
-            petName: petNames[data['petId']] ?? 'Unknown Pet',
+            petId: petId,
+            petName: petNames[petId] ?? 'Unknown Pet',
             type: 'activity',
             description: '${data['activityType']} - ${data['duration']} minutes',
             date: (data['date'] as Timestamp).toDate(),
@@ -247,10 +255,11 @@ class _HomeWidgetState extends State<HomeWidget> {
 
       for (var doc in medicationsQuery.docs) {
         var data = doc.data();
-        if (data['startDate'] != null && data['petId'] != null) {
+        String petId = data['petId'] as String;
+        if (data['startDate'] != null && petId != null) {
           allActivities.add(RecentActivity(
-            petId: data['petId'],
-            petName: petNames[data['petId']] ?? 'Unknown Pet',
+            petId: petId,
+            petName: petNames[petId] ?? 'Unknown Pet',
             type: 'medication',
             description: '${data['medicationName']} - ${data['dosage']}',
             date: (data['startDate'] as Timestamp).toDate(),
@@ -258,14 +267,14 @@ class _HomeWidgetState extends State<HomeWidget> {
         }
       }
 
-      print('Total activities found: ${allActivities.length}'); // Debug print
+      print('Total activities before sorting: ${allActivities.length}'); // Debug print
 
       // Rendezzük az összes aktivitást dátum szerint csökkenő sorrendbe
       allActivities.sort((a, b) => b.date.compareTo(a.date));
 
       // Visszaadjuk a két legfrissebb aktivitást
       var result = allActivities.take(2).toList();
-      print('Returning ${result.length} activities'); // Debug print
+      print('Final activities: ${result.map((a) => '${a.type} - ${a.petName}').join(', ')}'); // Debug print
       return result;
     } catch (error) {
       print('Error in _fetchRecentActivities: $error');

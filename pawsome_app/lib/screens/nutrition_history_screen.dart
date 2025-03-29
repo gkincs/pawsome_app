@@ -25,7 +25,7 @@ class _NutritionHistoryWidgetState extends State<NutritionHistoryWidget> {
   void _initNutritionItemsStream() {
     _nutritionItemsStream = FirebaseFirestore.instance
         .collection('feedingLogs')
-        .where('petId', isEqualTo: FirebaseFirestore.instance.doc('pets/${widget.petId}'))
+        .where('petId', isEqualTo: widget.petId)
         .orderBy('date', descending: true)
         .snapshots();
   }
