@@ -90,6 +90,7 @@ class _ExpensesHistoryWidgetState extends State<ExpensesHistoryWidget> {
   Widget _buildExpenseCard(DocumentSnapshot document, AppLocalizations l10n) {
     Map<String, dynamic> data = document.data() as Map<String, dynamic>;
     final date = data['date'] as Timestamp?;
+    final currency = data['currency'] as String? ?? 'EUR';
     
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -132,7 +133,7 @@ class _ExpensesHistoryWidgetState extends State<ExpensesHistoryWidget> {
             Row(
               children: [
                 Text(
-                  data['amount'] ?? '',
+                  '${data['amount'] ?? ''} $currency',
                   style: const TextStyle(
                     fontSize: 16,
                     color: Colors.grey,

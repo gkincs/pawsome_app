@@ -51,80 +51,63 @@ class _PetScreenWidgetState extends State<PetScreenWidget> {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
-          children: [
-            _buildHeader(l10n),
-            const Divider(color: Color(0xFFCAC4D0)),
-            Expanded(
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : pets.isNotEmpty
-                      ? _buildPetsList(l10n)
-                      : _buildEmptyState(l10n),
-            ),
-            _buildAddPetButton(l10n),
-          ],
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: Container(),
+        title: Text(
+          l10n.pets,
+          style: const TextStyle(
+            color: Color(0xFF65558F),
+            fontSize: 22,
+            fontWeight: FontWeight.w500,
+          ),
         ),
+        centerTitle: true,
       ),
-    );
-  }
-
-  Widget _buildHeader(AppLocalizations l10n) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Row(
+      body: Column(
         children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {},
-            color: const Color(0xFF65558F),
-          ),
-          Expanded(
-            child: Text(
-              l10n.pets,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w500,
-                color: Colors.black,
-              ),
-            ),
-          ),
-          const SizedBox(width: 48), // For symmetry
+          _buildPetsList(l10n),
+          _buildAddButton(l10n),
         ],
       ),
     );
   }
 
   Widget _buildPetsList(AppLocalizations l10n) {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: pets.length,
-      itemBuilder: (context, index) {
-        final pet = pets[index];
-        return Card(
-          margin: const EdgeInsets.only(bottom: 16),
-          child: ListTile(
-            leading: _buildPetAvatar(pet),
-            title: Text(pet['name']),
-            subtitle: Text(pet['breed']),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.edit, size: 20),
-                  onPressed: () => _navigateToPetProfile(pet['petId']),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close, size: 20, color: Colors.red),
-                  onPressed: () => _showDeleteConfirmation(pet['petId'], pet['name'], l10n),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+    return Expanded(
+      child: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : pets.isNotEmpty
+              ? ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: pets.length,
+                  itemBuilder: (context, index) {
+                    final pet = pets[index];
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      child: ListTile(
+                        leading: _buildPetAvatar(pet),
+                        title: Text(pet['name']),
+                        subtitle: Text(pet['breed']),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit, size: 20),
+                              onPressed: () => _navigateToPetProfile(pet['petId']),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.close, size: 20, color: Colors.red),
+                              onPressed: () => _showDeleteConfirmation(pet['petId'], pet['name'], l10n),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                )
+              : _buildEmptyState(l10n),
     );
   }
 
@@ -172,7 +155,7 @@ class _PetScreenWidgetState extends State<PetScreenWidget> {
     );
   }
 
-  Widget _buildAddPetButton(AppLocalizations l10n) {
+  Widget _buildAddButton(AppLocalizations l10n) {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: ElevatedButton(

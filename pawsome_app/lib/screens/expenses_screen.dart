@@ -16,6 +16,8 @@ class ExpensesWidget extends StatefulWidget {
 
 class _ExpensesWidgetState extends State<ExpensesWidget> {
   String selectedCategory = '';
+  String selectedCurrency = 'EUR';
+
   final TextEditingController _priceController = TextEditingController();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -104,15 +106,49 @@ class _ExpensesWidgetState extends State<ExpensesWidget> {
   Widget _buildPriceInput(AppLocalizations l10n) {
     return Padding(
       padding: const EdgeInsets.all(16),
-      child: TextField(
-        controller: _priceController,
-        decoration: InputDecoration(
-          labelText: l10n.cost,
-          border: const OutlineInputBorder(),
-        ),
-        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-        inputFormatters: [
-          FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _priceController,
+              decoration: InputDecoration(
+                labelText: l10n.cost,
+                border: const OutlineInputBorder(),
+              ),
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Container(
+            width: 100,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: selectedCurrency,
+                isExpanded: true,
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                items: ['EUR', 'HUF', 'USD'].map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  if (newValue != null) {
+                    setState(() {
+                      selectedCurrency = newValue;
+                    });
+                  }
+                },
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -162,6 +198,7 @@ class _ExpensesWidgetState extends State<ExpensesWidget> {
 
       await _firestore.collection('expenses').add({
         'amount': _priceController.text,
+        'currency': selectedCurrency,
         'date': FieldValue.serverTimestamp(),
         'description': selectedCategory,
         'petId': widget.petId,

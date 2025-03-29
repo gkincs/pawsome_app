@@ -197,7 +197,7 @@ class _HomeWidgetState extends State<HomeWidget> {
             petId: petId,
             petName: petNames[petId] ?? 'Unknown Pet',
             type: 'expense',
-            description: '${data['description']} - ${data['amount']}',
+            description: '${data['description']} - ${data['amount']} ${data['currency'] ?? 'Ft'}',
             date: (data['date'] as Timestamp).toDate(),
           ));
         }
@@ -539,44 +539,73 @@ class _HomeWidgetState extends State<HomeWidget> {
           return _buildEmptyActivityCard(l10n);
         }
 
-        String formattedDate = _formatDate(activity.date, l10n);
-        String activityTitle = _getActivityTitle(activity.type, l10n);
+        return _buildActivityCard(activity, l10n);
+      }).toList(),
+    );
+  }
 
-        return Card(
-          margin: const EdgeInsets.only(bottom: 8),
-          elevation: 2,
-          shadowColor: const Color(0xFF65558F).withOpacity(0.1),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-            side: const BorderSide(
-              color: Color(0xFFF3E8FD),
-              width: 1,
-            ),
+  Widget _buildActivityCard(RecentActivity activity, AppLocalizations l10n) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 4),
+      elevation: 4,
+      shadowColor: const Color(0xFF65558F).withOpacity(0.2),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+        side: const BorderSide(
+          color: Color(0xFFEADDFF),
+          width: 2,
+        ),
+      ),
+      child: ListTile(
+        dense: true,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        title: Text(
+          activity.petName,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF65558F),
           ),
-          child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            title: RichText(
-              text: TextSpan(
-                style: const TextStyle(
-                  color: Color(0xFF65558F),
-                  fontWeight: FontWeight.w500,
-                ),
-                children: [
-                  TextSpan(text: '${activity.petName} - '),
-                  TextSpan(text: activityTitle),
-                ],
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 2),
+            Text(
+              _getActivityTitle(activity.type, l10n),
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF65558F),
               ),
             ),
-            subtitle: Text('${activity.description}\n$formattedDate'),
-          ),
-        );
-      }).toList(),
+            const SizedBox(height: 2),
+            Text(
+              activity.description,
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF65558F),
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              _formatDate(activity.date, l10n),
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF65558F),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
   Widget _buildEmptyActivityCard(AppLocalizations l10n) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: 4),
       elevation: 2,
       shadowColor: const Color(0xFF65558F).withOpacity(0.1),
       shape: RoundedRectangleBorder(
@@ -587,11 +616,14 @@ class _HomeWidgetState extends State<HomeWidget> {
         ),
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        dense: true,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         title: Text(
           l10n.noActivitiesAdded,
           style: const TextStyle(
-            color: Colors.grey,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF65558F),
             fontStyle: FontStyle.italic,
           ),
         ),
