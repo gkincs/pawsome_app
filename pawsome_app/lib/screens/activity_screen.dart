@@ -4,7 +4,7 @@ import 'package:pawsome_app/screens/activity_history_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ActivityScreenWidget extends StatefulWidget {
-  final String? petId;
+  final String petId;
 
   const ActivityScreenWidget({super.key, required this.petId});
 
@@ -28,13 +28,13 @@ class _ActivityScreenWidgetState extends State<ActivityScreenWidget> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _buildHeader(),
+                _buildHeader(l10n),
                 const Divider(color: Color(0xFFCAC4D0)),
-                _buildActivityTypeSection(),
+                _buildActivityTypeSection(l10n),
                 const Divider(color: Color(0xFFCAC4D0)),
-                _buildDurationSection(),
+                _buildDurationSection(l10n),
                 const SizedBox(height: 24),
-                _buildSaveButton(),
+                _buildSaveButton(l10n),
               ],
             ),
           ),
@@ -43,29 +43,27 @@ class _ActivityScreenWidgetState extends State<ActivityScreenWidget> {
     );
   }
 
-Widget _buildHeader() {
-  final l10n = AppLocalizations.of(context)!;
-  return Container(
-    padding: const EdgeInsets.symmetric(vertical: 16),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          l10n.activityInformation,
-          style: const TextStyle(
-            fontFamily: 'Roboto',
-            fontSize: 22,
-            fontWeight: FontWeight.w500,
-            color: Colors.black,
+  Widget _buildHeader(AppLocalizations l10n) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            l10n.activityInformation,
+            style: const TextStyle(
+              fontFamily: 'Roboto',
+              fontSize: 22,
+              fontWeight: FontWeight.w500,
+              color: Colors.black,
+            ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 
-  Widget _buildActivityTypeSection() {
-    final l10n = AppLocalizations.of(context)!;
+  Widget _buildActivityTypeSection(AppLocalizations l10n) {
     final List<String> activityTypes = [
       l10n.walk,
       l10n.play,
@@ -107,8 +105,7 @@ Widget _buildHeader() {
     );
   }
 
-  Widget _buildDurationSection() {
-    final l10n = AppLocalizations.of(context)!;
+  Widget _buildDurationSection(AppLocalizations l10n) {
     final List<String> durations = [
       l10n.lessThan30Min,
       l10n.thirtyMin,
@@ -150,8 +147,7 @@ Widget _buildHeader() {
     );
   }
 
-  Widget _buildSaveButton() {
-    final l10n = AppLocalizations.of(context)!;
+  Widget _buildSaveButton(AppLocalizations l10n) {
     return ElevatedButton(
       onPressed: _saveActivityInfo,
       style: ElevatedButton.styleFrom(
@@ -168,13 +164,6 @@ Widget _buildHeader() {
 
   void _saveActivityInfo() async {
     final l10n = AppLocalizations.of(context)!;
-    if (widget.petId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.noPetSelected)),
-      );
-      return;
-    }
-
     if (selectedActivityType == null || selectedDuration == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.selectActivityAndDuration)),
@@ -194,13 +183,8 @@ Widget _buildHeader() {
         SnackBar(content: Text(l10n.activitySaved)),
       );
 
-      // Navigate back to ActivityHistoryWidget
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ActivityHistoryWidget(petId: widget.petId!),
-        ),
-      );
+      // Return to previous screen (Diary widget)
+      Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.errorSavingActivity(e.toString()))),

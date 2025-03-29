@@ -14,44 +14,20 @@ class ActivityHistoryWidget extends StatefulWidget {
 }
 
 class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
-  List<Map<String, dynamic>> activities = [];
-  bool isLoading = true;
+  late Stream<QuerySnapshot> _activitiesStream;
 
   @override
   void initState() {
     super.initState();
-    _fetchActivities();
+    _initActivitiesStream();
   }
 
-  Future<void> _fetchActivities() async {
-    setState(() {
-      isLoading = true;
-    });
-
-    try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('activityLogs')
-          .where('petId', isEqualTo: FirebaseFirestore.instance.doc('pets/${widget.petId}'))
-          .orderBy('date', descending: true)
-          .get();
-
-      setState(() {
-        activities = querySnapshot.docs.map((doc) {
-          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-          return {
-            'activityType': data['activityType'],
-            'duration': data['duration'],
-            'date': (data['date'] as Timestamp).toDate(),
-          };
-        }).toList();
-        isLoading = false;
-      });
-    } catch (e) {
-      print("Error fetching activities: $e");
-      setState(() {
-        isLoading = false;
-      });
-    }
+  void _initActivitiesStream() {
+    _activitiesStream = FirebaseFirestore.instance
+        .collection('activityLogs')
+        .where('petId', isEqualTo: FirebaseFirestore.instance.doc('pets/${widget.petId}'))
+        .orderBy('date', descending: true)
+        .snapshots();
   }
 
   @override
@@ -67,17 +43,30 @@ class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
                 _buildHeader(l10n),
                 const Divider(color: Color(0xFFCAC4D0)),
                 Expanded(
-                  child: activities.isEmpty
-                      ? _buildEmptyState()
-                      : ListView.builder(
-                          padding: const EdgeInsets.all(16),
-                          itemCount: activities.length,
-                          itemBuilder: (context, index) {
-                            return _buildActivityCard(activities[index], l10n);
-                          },
-                        ),
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: _activitiesStream,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      if (snapshot.hasError) {
+                        return Center(child: Text('${l10n.error}: ${snapshot.error}'));
+                      }
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                        return _buildEmptyState(l10n);
+                      }
+                      return ListView.builder(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: snapshot.data!.docs.length,
+                        itemBuilder: (context, index) {
+                          Map<String, dynamic> data = snapshot.data!.docs[index].data() as Map<String, dynamic>;
+                          return _buildActivityCard(data, l10n);
+                        },
+                      );
+                    },
+                  ),
                 ),
-                _buildAddButton(),
+                _buildAddButton(l10n),
               ],
             );
           },
@@ -103,17 +92,19 @@ class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
   }
 
   Widget _buildActivityCard(Map<String, dynamic> activity, AppLocalizations l10n) {
+    final Timestamp? date = activity['date'] as Timestamp?;
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       elevation: 4,
       shadowColor: Colors.black.withOpacity(0.1),
       child: ListTile(
-        title: Text(activity['activityType'].toString().capitalize()),
+        title: Text(activity['activityType']?.toString().capitalize() ?? ''),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('${l10n.duration}: ${activity['duration']} minutes'),
-            Text('${l10n.date}: ${DateFormat('yyyy-MM-dd').format(activity['date'])}'),
+            if (date != null)
+              Text('${l10n.date}: ${DateFormat('yyyy-MM-dd').format(date.toDate())}'),
           ],
         ),
         trailing: IconButton(
@@ -167,7 +158,6 @@ class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(l10n.deleteEntry)),
         );
-        _fetchActivities();
       }
     } catch (e) {
       if (mounted) {
@@ -178,8 +168,7 @@ class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
     }
   }
 
-  Widget _buildEmptyState() {
-    final l10n = AppLocalizations.of(context)!;
+  Widget _buildEmptyState(AppLocalizations l10n) {
     return Center(
       child: Text(
         l10n.noActivities,
@@ -191,8 +180,7 @@ class _ActivityHistoryWidgetState extends State<ActivityHistoryWidget> {
     );
   }
 
-  Widget _buildAddButton() {
-    final l10n = AppLocalizations.of(context)!;
+  Widget _buildAddButton(AppLocalizations l10n) {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: ElevatedButton(
