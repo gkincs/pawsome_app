@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:pawsome_app/screens/activity_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+/// Az a képernyő, amely megjeleníti egy adott kisállat tevékenységeinek előzményeit.
+/// A tevékenységek Firestore-ból kerülnek betöltésre, és időrendben jelennek meg.
 class ActivityHistoryWidget extends StatefulWidget {
   final String petId;
 

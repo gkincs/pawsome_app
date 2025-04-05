@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:pawsome_app/screens/nutrition_history_screen.dart';
 
+/// Az a képernyő, amely lehetővé teszi a felhasználó számára, hogy rögzítse a kisállat etetési adatait.
+/// Az adatok, például az étel típusa, mennyisége és az etetés időpontja elmenthetőek Firestore-ba
 class NutritionDiaryWidget extends StatefulWidget {
   final String petId;
 

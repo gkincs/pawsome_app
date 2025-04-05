@@ -6,6 +6,11 @@ import 'package:pawsome_app/screens/main_screen.dart';
 import 'package:pawsome_app/screens/login_screen.dart';
 import 'package:pawsome_app/screens/signin_screen.dart';
 
+/// Ez az osztály felelős az alkalmazás kezdőképernyőjének kezeléséért.
+/// A felhasználó állapotától függően navigál a megfelelő képernyőre:
+/// Ha a felhasználó nincs bejelentkezve, a `SigninWidget` jelenik meg.
+/// Ha a felhasználó be van jelentkezve, de ez az első bejelentkezése, a `FirststepWidget` jelenik meg.
+/// Ha a felhasználó már bejelentkezett korábban, a `MainScreen` jelenik meg.
 class ScreenManager extends StatelessWidget {
   const ScreenManager({super.key});
 

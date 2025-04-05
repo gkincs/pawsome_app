@@ -6,6 +6,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
+/// Az a képernyő, amely segítségével a felhasználó létrehozza, vagy szerkessze egy kisállat profilját.
+/// A profil tartalmazza a kisállat nevét, fajtáját, születési dátumát, nemét és profilképét.
 class PetProfileWidget extends StatefulWidget {
   final String? petId;
   final bool isFirstRegistration;

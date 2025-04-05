@@ -8,6 +8,8 @@ import 'package:pawsome_app/screens/main_screen.dart';
 import 'package:pawsome_app/widgets/language_switcher.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+/// Ez a képernyő, amely lehetővé teszi a felhasználó számára, hogy bejelentkezzen a meglévő fiókjába.
+/// A felhasználó bejelentkezési adatai (e-mail és jelszó) ellenőrzésre kerülnek a Firebase Authentication segítségével.
 class LoginWidget extends StatefulWidget {
   const LoginWidget({super.key});
 

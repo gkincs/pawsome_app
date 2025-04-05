@@ -13,12 +13,16 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'services/language_service.dart';
 
+// Az alkalmazás belépési pontja.
+/// Inicializálja a Firebase-t, beállítja a Bloc és Provider állapotkezelést,
+///Kezeli az alkalmazás életciklusát és a nyelvi beállításokat.
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(const Pawsome());
 }
 
+/// A Pawsome osztály az alkalmazás gyökér widgetje.
 class Pawsome extends StatefulWidget {
   const Pawsome({super.key});
 
@@ -51,6 +55,7 @@ class _PawsomeState extends State<Pawsome> with WidgetsBindingObserver {
     }
   }
 
+ /// Ha az alkalmazás visszatér a háttérből, ellenőrzi a felhasználó hitelesítési állapotát.
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(

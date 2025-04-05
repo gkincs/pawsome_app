@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pawsome_app/screens/activity_history_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+/// Az a képernyő, amely lehetővé teszi a tevékenységi adatok megadását egy adott kisállathoz.
+/// A tevékenységek típusa és időtartama kiválasztható, majd elmenthető Firestore-ba.
 class ActivityScreenWidget extends StatefulWidget {
   final String petId;
 

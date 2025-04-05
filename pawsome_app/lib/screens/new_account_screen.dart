@@ -5,6 +5,7 @@ import 'package:pawsome_app/screens/login_screen.dart';
 import 'package:pawsome_app/screens/first_step_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+/// Az a képernyő, amely lehetővé teszi a felhasználó számára, hogy új fiókot hozzon létre.
 class NewAccountWidget extends StatefulWidget {
   const NewAccountWidget({super.key});
 

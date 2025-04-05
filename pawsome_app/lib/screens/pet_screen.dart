@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pawsome_app/screens/pet_prof_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+/// Az a képernyő, amely megjeleníti a felhasználó kisállatainak listáját.
+/// A felhasználó hozzáadhat új kisállatot, szerkesztheti a meglévőket, vagy törölheti.
 class PetScreenWidget extends StatefulWidget {
   final String? petId;
 

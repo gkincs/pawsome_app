@@ -5,6 +5,9 @@ import 'package:pawsome_app/screens/expenses_history_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+
+/// Az a képernyő, amely lehetővé teszi, kiadási adatok megadását egy adott kisállathoz.
+/// A kiadások kategóriája, összege és pénzneme kiválasztható, majd elmenthető Firestore-ba.
 class ExpensesWidget extends StatefulWidget {
   final String? petId;
 

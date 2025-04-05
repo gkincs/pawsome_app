@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+/// Az események, amelyek a BottomNavigationBar állapotát változtatják.
 // Events
 abstract class BottomNavigationEvent {}
 
@@ -8,6 +9,7 @@ class ChangeTabEvent extends BottomNavigationEvent {
   ChangeTabEvent(this.index);
 }
 
+/// Az állapot, amely a BottomNavigationBar aktuális állapotát reprezentálja.
 // States
 class BottomNavigationState {
   final int currentIndex;
@@ -28,7 +30,7 @@ class BottomNavigationState {
     );
   }
 }
-
+/// A BottomNavigationBloc osztály kezeli a navigációs eseményeket és állapotokat.
 // Bloc
 class BottomNavigationBloc extends Bloc<BottomNavigationEvent, BottomNavigationState> {
   BottomNavigationBloc() : super(BottomNavigationState()) {

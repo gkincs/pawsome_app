@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:pawsome_app/screens/appointment_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+/// Az a képernyő, amely megjeleníti egy adott kisállat időpontjainak előzményeit.
+/// Az időpontok Firestore-ból kerülnek betöltésre, és időrendben jelennek meg.
 class AppointmentHistoryWidget extends StatefulWidget {
   final String petId;
 

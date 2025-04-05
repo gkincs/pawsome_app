@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pawsome_app/screens/health_info_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+/// Az a képernyő, amely megjeleníti egy adott kisállat gyógyszeres kezeléseinek előzményeit.
+/// A gyógyszeres kezelések Firestore-ból kerülnek betöltésre, és időrendben jelennek meg.
 class MedicationHistoryWidget extends StatefulWidget {
   final String petId;
 

@@ -4,6 +4,9 @@ import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:pawsome_app/screens/medication_history_screen.dart';
 
+/// Az a képernyő, amely lehetővé teszi hogy egészségügyi adatokat
+///  például gyógyszeres kezeléseket adjon meg egy adott kisállathoz.
+/// Az adatok, például gyógyszer neve, adagolás, gyakoriság, kezdő- és végdátum elmenthetők Firestore-ba.
 class HealthInfoWidget extends StatefulWidget {
   final String petId;
 

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:pawsome_app/screens/login_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+/// Ez a kezdőképernyő, amely lehetővé teszi a felhasználó számára, hogy navigáljon a bejelentkezési képernyőre.
+/// Az alkalmazás indításakor jelenik meg.
 class SigninWidget extends StatefulWidget {
   const SigninWidget({super.key});
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/language_service.dart';
 
+/// Lehetővé teszi a felhasználó számára, hogy váltson az angol és a magyar nyelv között.
 class LanguageSwitcher extends StatelessWidget {
   const LanguageSwitcher({super.key});
 

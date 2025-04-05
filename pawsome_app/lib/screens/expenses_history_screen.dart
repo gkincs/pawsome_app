@@ -4,6 +4,8 @@ import 'package:pawsome_app/screens/expenses_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+/// Az a képernyő, amely megjeleníti egy adott kisállat kiadásainak előzményeit.
+/// A kiadások Firestore-ból kerülnek betöltésre, és időrendben jelennek meg.
 class ExpensesHistoryWidget extends StatefulWidget {
   final String petId;
 

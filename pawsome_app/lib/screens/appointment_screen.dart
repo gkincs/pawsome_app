@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pawsome_app/screens/appointment_history_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+/// Az a képernyő, amely lehetővé teszi, hogy időpontot rőgzíthessen egy kisállathoz.
+/// Az időpont adatai, például dátum, idő, hely és cél, elmenthetőek Firestore-ba.
 class AppointmentWidget extends StatefulWidget {
   final String petId;
 

@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:pawsome_app/screens/nutrition_diary.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+/// Az a képernyő, amely megjeleníti egy adott kisállat etetési előzményeit.
+/// Az etetési adatok Firestore-ból kerülnek betöltésre, és időrendben jelennek meg.
 class NutritionHistoryWidget extends StatefulWidget {
   final String petId;
 

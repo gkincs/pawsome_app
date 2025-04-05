@@ -8,6 +8,9 @@ import 'package:pawsome_app/screens/medication_history_screen.dart';
 import 'package:pawsome_app/screens/expenses_history_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+// Az a képernyő, amely lehetővé teszi a különböző naplózási funkciókat.
+/// például táplálkozási, tevékenységi, egészségügyi és kiadási előzményeket.
+/// A kisállatok listája a Firestore-ból kerül betöltésre.
 class DiaryWidget extends StatefulWidget {
   const DiaryWidget({super.key});
 

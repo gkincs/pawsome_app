@@ -6,14 +6,18 @@ import 'package:pawsome_app/screens/pet_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+/// Ez az osztály egy kisállat adatait reprezentálja, amelyeket a Firestore-ból töltünk be.
 class Pet {
   final String id;
   final String name;
   final String breed;
   final String? profileImageUrl;
 
+///Konstruktor
   Pet({required this.id, required this.name, required this.breed, this.profileImageUrl});
 
+/// A Firestore-ból való betöltéshez szükséges konstruktor
+/// egy Firestore dokumentumból hoz létre egy Pet objektumot.
   factory Pet.fromFirestore(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
     return Pet(
@@ -25,6 +29,7 @@ class Pet {
   }
 }
 
+///Egy kisállathoz kapcsolódó legutóbbi tevékenységet reprezentáló osztály.
 class RecentActivity {
   final String petId;
   final String petName;
@@ -41,6 +46,8 @@ class RecentActivity {
   });
 }
 
+/// Az a képernyő, amely a felhasználó kisállatainak listáját és a legutóbbi tevékenységeket jeleníti meg.
+/// A felhasználó navigálhat a kisállatok részletes képernyőire, valamint megtekintheti a legutóbbi eseményeket
 class HomeWidget extends StatefulWidget {
   const HomeWidget({super.key});
 

@@ -2,7 +2,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../repositories/user_repository.dart';
 
-// Define AuthState
+///Az AuthBloc osztály kezeli a felhasználói hitelesítést és az állapotváltozásokat.
+///Ez a fájl tartalmazza az AuthState és AuthEvent osztályokat is, amelyek a Bloc állapotát és eseményeit definiálják.
 class AuthState {
   final bool isLoading;
   final User? user;

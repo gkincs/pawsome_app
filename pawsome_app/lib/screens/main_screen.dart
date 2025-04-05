@@ -6,6 +6,9 @@ import 'package:pawsome_app/screens/diary_screen.dart';
 import 'package:pawsome_app/widgets/bottom_navigation_widget.dart';
 import 'package:pawsome_app/bloc/bottom_navigation_bloc.dart';
 
+/// A `MainScreen` a főképernyő, amely tartalmazza az alkalmazás három fő szekcióját:
+/// Főképernyő (Home), Kisállatok (Pets) és a Napló (Diary)
+/// A képernyők között a `BottomNavigationBar` segítségével lehet navigálni.
 class MainScreen extends StatelessWidget {
   MainScreen({super.key});
 

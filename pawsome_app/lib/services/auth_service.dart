@@ -1,6 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+/// Ez az osztály felelős a felhasználói hitelesítéssel és a Firestore-ban tárolt felhasználói adatok kezelésével.
+/// Tartalmazza a bejelentkezés, kijelentkezés, első bejelentkezés ellenőrzése
+/// a felhasználói adatok mentése és kisállatok hozzáadása funkciókat.
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;

@@ -10,6 +10,8 @@ class FirststepWidget extends StatefulWidget {
   _FirststepWidgetState createState() => _FirststepWidgetState();
 }
 
+/// Az a képernyő, amely segítéségével a felhasználó hozzáadhatja az első kisállatát a profilhoz.
+/// Ha a kisállat profilját sikeresen elmenti, akkor a főképernyőre navigál.
 class _FirststepWidgetState extends State<FirststepWidget> {
   final bool _isLoading = false;
 

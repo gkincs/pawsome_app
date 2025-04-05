@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// Ez az osztály felelős az alkalmazás nyelvének kezeléséért.
+/// A kiválasztott nyelvet eltárolja a SharedPreferences-be.
 class LanguageService extends ChangeNotifier {
   static const String _languageKey = 'selected_language';
   late SharedPreferences _prefs;
